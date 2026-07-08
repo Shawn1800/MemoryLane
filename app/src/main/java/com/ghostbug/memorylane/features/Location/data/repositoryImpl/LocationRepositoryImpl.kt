@@ -10,6 +10,6 @@ class LocationRepositoryImpl(
 ) : LocationRepository {
 
     override  fun getLocation(): Flow<Result<LocationModel?>> {
-       return locationDataSource.getLocation()
+       return locationDataSource.findLocation()
     }
 }

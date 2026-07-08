@@ -36,6 +36,7 @@ fun MapScreen(
     locationViewModel: LocationViewModel = koinViewModel()
 ) {
     val state by locationViewModel.state.collectAsStateWithLifecycle()
+
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
@@ -77,7 +78,7 @@ fun MapContent(
     // Whenever the ViewModel produces a new location, fly the camera to it.
     LaunchedEffect(location) {
         val lat = location?.latitude
-        val lng = location?.longitude
+        val lng = location?.longitude  // needs to eb changed
         if (lat != null && lng != null) {
             mapViewportState.flyTo(
                 cameraOptions {

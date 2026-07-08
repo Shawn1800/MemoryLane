@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import androidx.core.content.ContextCompat
 import com.ghostbug.memorylane.features.Location.domain.model.LocationModel
 import android.util.Log
+import androidx.core.app.ActivityCompat
 import com.mapbox.common.location.AccuracyLevel
 import com.mapbox.common.location.DeviceLocationProvider
 import com.mapbox.common.location.IntervalSettings
@@ -24,19 +25,41 @@ import kotlinx.coroutines.flow.flow
 class LocationDataSource (
    private val  context: Context
 ) {
-    fun getLocation(): Flow<Result<LocationModel?>> {
 
-        val hasPermission = ContextCompat.checkSelfPermission(context,
-            Manifest.permission.ACCESS_FINE_LOCATION,) == PackageManager.PERMISSION_GRANTED
+//    suspend fun requestPermission(): Boolean
 
-        return if (hasPermission) {
-            findLocation()
-        } else {
-            flow {
-                emit(Result.failure(Exception("Location permission not granted. Request it in the UI.")))
-            }
-        }
-    }
+
+//    fun getLocation(): Flow<Result<LocationModel?>> {
+//
+//        val hasPermission = ContextCompat.checkSelfPermission(
+//            context,
+//            Manifest.permission.ACCESS_FINE_LOCATION,
+//        ) == PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(
+//            context,
+//            Manifest.permission.ACCESS_COARSE_LOCATION
+//        ) == PackageManager.PERMISSION_GRANTED
+//
+//        return if (hasPermission) {
+//            findLocation()
+//        } else if (ContextCompat.shouldShowRequestPermissionRationale(
+//                context,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) || ActivityCompat.shouldShowRequestPermissionRationale(
+//                context,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            )
+//        ) {
+//
+//            PermissionUtils.RationaleDialog.newInstance(
+//                LOCATION_PERMISSION_REQUEST_CODE, true
+//            ).show(supportFragmentManager, "dialog")
+//            return
+//        } else {
+//            flow {
+//                emit(Result.failure(Exception("Location permission not granted. Request it in the UI.")))
+//            }
+//        }
+//    }
 
     @SuppressLint("RestrictedApi")
     fun findLocation(): Flow<Result<LocationModel>> = callbackFlow {
