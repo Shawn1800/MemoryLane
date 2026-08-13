@@ -1,12 +1,13 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
 }
 
 android {
     namespace = "com.ghostbug.memorylane"
     compileSdk {
-        version = release(36) {
+        version = release(37) {
             minorApiLevel = 1
         }
     }
@@ -53,12 +54,22 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
+
     implementation("com.mapbox.maps:android-ndk27:11.25.0")
     implementation("com.mapbox.extension:maps-compose-ndk27:11.25.0")
+
+    implementation("com.google.android.gms:play-services-location:21.0.1")
+
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)  // No version need
     implementation(libs.koin.compose)            // KoinContext + koinInject() for Compose
     implementation(libs.koin.compose.viewmodel)  // koinViewModel() for Compose
-    implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    implementation("androidx.navigation3:navigation3-runtime:1.2.0-alpha07")
+    implementation("androidx.navigation3:navigation3-ui:1.2.0-alpha07")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3")
+
+    implementation("androidx.compose.material:material-icons-extended:<version>")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:<version>")
 
 }

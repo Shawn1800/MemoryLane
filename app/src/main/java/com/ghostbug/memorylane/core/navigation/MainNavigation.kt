@@ -1,0 +1,99 @@
+package com.ghostbug.memorylane.core.navigation
+
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Scaffold
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
+import com.ghostbug.memorylane.MyApplication
+import com.ghostbug.memorylane.features.Location.domain.LocationUseCase
+import com.ghostbug.memorylane.features.Location.presentation.LocationViewModel
+import com.ghostbug.memorylane.features.Location.presentation.MapScreen
+import org.koin.compose.viewmodel.koinViewModel
+
+@Composable
+fun MainNavigation(
+    modifier: Modifier = Modifier
+) {
+    val context = LocalContext.current
+    val app = context.applicationContext as MyApplication
+
+
+
+    val locationViewModel : LocationViewModel = koinViewModel()
+
+
+
+
+    val navigationState = rememberNavigationState(
+        startRoute = Route.LocationScreen,
+        topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
+    )
+
+    val navigator = remember(navigationState) {
+        Navigator(navigationState)
+    }
+
+
+
+    Scaffold(
+        modifier = modifier,
+        bottomBar = {
+                BottomNavigationBar(
+                    selectedKey = navigationState.topLevelRoute,
+                    onSelectKey = {
+                        navigator.navigate(it)
+                    }
+                )
+        }
+    ) { innerPadding ->
+        NavDisplay(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = innerPadding.calculateBottomPadding()),
+
+            onBack = navigator::goBack,
+
+            transitionSpec = {
+                slideInHorizontally(initialOffsetX = { it }) togetherWith
+                        slideOutHorizontally(targetOffsetX = { -it / 3 }) + fadeOut()
+            },
+            popTransitionSpec = {
+                slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it / 3 }) + fadeOut()
+            },
+            predictivePopTransitionSpec = {
+                slideInHorizontally(initialOffsetX = { -it }) togetherWith
+                        slideOutHorizontally(targetOffsetX = { it / 3 }) + fadeOut()
+            },
+
+            entries = navigationState.toEntries(
+                entryProvider {
+                    entry<Route.LocationScreen> {
+                        MapScreen(
+                            locationViewModel = locationViewModel,
+                        )
+                    }
+                }
+            )
+        )
+    }
+}

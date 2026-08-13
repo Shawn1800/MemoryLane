@@ -37,34 +37,16 @@ fun MapScreen(
 ) {
     val state by locationViewModel.state.collectAsStateWithLifecycle()
 
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestMultiplePermissions()
-    ) { result ->
-        val granted = result[Manifest.permission.ACCESS_FINE_LOCATION] == true ||
-                result[Manifest.permission.ACCESS_COARSE_LOCATION] == true
-        if (granted) {
-            locationViewModel.onEvent(LocationEvent.OnLocationButton)
-        }
-    }
-
     MapContent(
         location = state.location,
-        onLocationClick = {
-            permissionLauncher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                )
-            )
-        }
     )
 }
 
 @Composable
 fun MapContent(
     location: LocationModel?,
-    onLocationClick: () -> Unit,
 ) {
+
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
             zoom(2.0)
@@ -119,14 +101,14 @@ fun MapContent(
             }
 
         }
-        FloatingActionButton(
-            onClick = onLocationClick,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(16.dp)
-        ) {
-            Text("LOC")
-        }
+//        FloatingActionButton(
+//            onClick = onLocationClick,
+//            modifier = Modifier
+//                .align(Alignment.BottomEnd)
+//                .padding(16.dp)
+//        ) {
+//            Text("LOC")
+//        }
     }
 }
 

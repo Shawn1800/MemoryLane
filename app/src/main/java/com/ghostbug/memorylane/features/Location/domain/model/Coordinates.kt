@@ -1,6 +1,6 @@
 package com.ghostbug.memorylane.features.Location.domain.model
 
-data class LocationModel(
+data class Coordinates(
     val latitude: Double,
     val longitude: Double,
     val timestamp: Long?,
