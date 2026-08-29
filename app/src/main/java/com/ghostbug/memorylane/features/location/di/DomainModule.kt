@@ -1,6 +1,6 @@
-package com.ghostbug.memorylane.features.Location.di
+package com.ghostbug.memorylane.features.location.di
 
-import com.ghostbug.memorylane.features.Location.domain.LocationUseCase
+import com.ghostbug.memorylane.features.location.domain.LocationUseCase
 import org.koin.dsl.module
 
 val domainModule = module {

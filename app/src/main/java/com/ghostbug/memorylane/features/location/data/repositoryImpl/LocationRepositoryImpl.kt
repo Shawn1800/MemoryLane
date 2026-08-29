@@ -1,8 +1,8 @@
-package com.ghostbug.memorylane.features.Location.data.repositoryImpl
+package com.ghostbug.memorylane.features.location.data.repositoryImpl
 
 import com.ghostbug.memorylane.core.data.datasouce.LocationDataSource
-import com.ghostbug.memorylane.features.Location.domain.model.Coordinates
-import com.ghostbug.memorylane.features.Location.domain.repository.LocationRepository
+import com.ghostbug.memorylane.features.location.domain.model.Coordinates
+import com.ghostbug.memorylane.features.location.domain.repository.LocationRepository
 import kotlinx.coroutines.flow.Flow
 
 

@@ -1,8 +1,5 @@
-package com.ghostbug.memorylane.features.Location.presentation
+package com.ghostbug.memorylane.features.location.presentation
 
-import android.Manifest
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -15,16 +12,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.ghostbug.memorylane.features.Location.domain.model.LocationModel
+import com.ghostbug.memorylane.features.location.domain.model.Coordinates
 import com.mapbox.geojson.Point
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
 import com.mapbox.maps.extension.compose.animation.viewport.rememberMapViewportState
-import com.mapbox.maps.extension.style.expressions.dsl.generated.pitch
-import com.mapbox.maps.extension.style.expressions.dsl.generated.zoom
-import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.pitch
-import com.mapbox.maps.extension.style.expressions.generated.Expression.Companion.zoom
 import com.mapbox.maps.plugin.PuckBearing
 import com.mapbox.maps.plugin.animation.MapAnimationOptions.Companion.mapAnimationOptions
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
@@ -36,15 +29,18 @@ fun MapScreen(
     locationViewModel: LocationViewModel = koinViewModel()
 ) {
     val state by locationViewModel.state.collectAsStateWithLifecycle()
-
     MapContent(
         location = state.location,
+        loading = state.loading,
+        onLocationClick = {locationViewModel.onEvent(LocationEvent.OnLocationButton)}
     )
 }
 
 @Composable
 fun MapContent(
-    location: LocationModel?,
+    location: Coordinates?,
+    loading: Boolean,
+    onLocationClick: () -> Unit
 ) {
 
     val mapViewportState = rememberMapViewportState {
@@ -101,14 +97,14 @@ fun MapContent(
             }
 
         }
-//        FloatingActionButton(
-//            onClick = onLocationClick,
-//            modifier = Modifier
-//                .align(Alignment.BottomEnd)
-//                .padding(16.dp)
-//        ) {
-//            Text("LOC")
-//        }
+        FloatingActionButton(
+            onClick = onLocationClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(16.dp)
+        ) {
+            Text("LOC")
+        }
     }
 }
 

@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.Location.presentation
+package com.ghostbug.memorylane.features.location.presentation
 
 sealed class LocationEvent  {
     data object OnLocationButton : LocationEvent()

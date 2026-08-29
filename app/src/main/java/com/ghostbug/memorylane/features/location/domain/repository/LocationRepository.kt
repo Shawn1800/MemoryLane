@@ -1,6 +1,6 @@
-package com.ghostbug.memorylane.features.Location.domain.repository
+package com.ghostbug.memorylane.features.location.domain.repository
 
-import com.ghostbug.memorylane.features.Location.domain.model.Coordinates
+import com.ghostbug.memorylane.features.location.domain.model.Coordinates
 import kotlinx.coroutines.flow.Flow
 
 interface LocationRepository {

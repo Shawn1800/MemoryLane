@@ -1,6 +1,6 @@
-package com.ghostbug.memorylane.features.Location.di
+package com.ghostbug.memorylane.features.location.di
 
-import com.ghostbug.memorylane.features.Location.presentation.LocationViewModel
+import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

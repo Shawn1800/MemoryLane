@@ -71,5 +71,6 @@ dependencies {
 
     implementation("androidx.compose.material:material-icons-extended:<version>")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:<version>")
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
 
 }

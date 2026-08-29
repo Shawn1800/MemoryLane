@@ -1,9 +1,9 @@
 package com.ghostbug.memorylane
 
 import android.app.Application
-import com.ghostbug.memorylane.features.Location.di.dataModule
-import com.ghostbug.memorylane.features.Location.di.domainModule
-import com.ghostbug.memorylane.features.Location.di.uiModule
+import com.ghostbug.memorylane.features.location.di.dataModule
+import com.ghostbug.memorylane.features.location.di.domainModule
+import com.ghostbug.memorylane.features.location.di.uiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.core.context.startKoin
 

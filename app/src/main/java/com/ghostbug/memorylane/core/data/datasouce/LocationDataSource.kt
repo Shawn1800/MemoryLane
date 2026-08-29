@@ -1,11 +1,9 @@
 package com.ghostbug.memorylane.core.data.datasouce
 
 import android.content.ContentValues.TAG
-import android.content.Context
 import android.util.Log
-import com.ghostbug.memorylane.features.Location.domain.model.Coordinates
+import com.ghostbug.memorylane.features.location.domain.model.Coordinates
 import com.mapbox.common.location.AccuracyLevel
-import com.mapbox.common.location.DeviceLocationProvider
 import com.mapbox.common.location.IntervalSettings
 import com.mapbox.common.location.Location
 import com.mapbox.common.location.LocationObserver
@@ -17,7 +15,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 class LocationDataSource {
     val locationService: LocationService = LocationServiceFactory.getOrCreate()
@@ -33,15 +30,13 @@ class LocationDataSource {
             .displacement(0F)
             .accuracy(AccuracyLevel.HIGHEST)
             .build();
-
     fun getCurrentLocation(): Flow<Coordinates> = callbackFlow {
         val result = locationService.getDeviceLocationProvider(request)
         if (result.isError) {
             close()
             return@callbackFlow
         }
-        val locationProvider = result.value
-            ?: run {
+        val locationProvider = result.value?: run {
                 close()
                 return@callbackFlow
             }
@@ -49,9 +44,7 @@ class LocationDataSource {
         if (result.isValue) {
             val locationObserver = object : LocationObserver {
                 override fun onLocationUpdateReceived(locations: MutableList<Location?>) {
-
                     val latest = locations.lastOrNull() ?: return
-
                     val coordinates = Coordinates(
                         latitude = latest.latitude,
                         longitude = latest.longitude,
@@ -65,14 +58,11 @@ class LocationDataSource {
                     Log.d(TAG, "Location update received: " + locations)
                 }
             }
-
             locationProvider.addLocationObserver(locationObserver)
-
             awaitClose {
                 locationProvider.removeLocationObserver(locationObserver)
             }
         }
-
     }
 
     suspend fun getLastKnownLocation(): Coordinates? = suspendCancellableCoroutine { continuation ->
@@ -99,5 +89,4 @@ class LocationDataSource {
             continuation.resume(coordinates)
         }
     }
-
 }

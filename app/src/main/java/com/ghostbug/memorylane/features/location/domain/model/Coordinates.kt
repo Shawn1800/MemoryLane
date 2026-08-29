@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.Location.domain.model
+package com.ghostbug.memorylane.features.location.domain.model
 
 data class Coordinates(
     val latitude: Double,
