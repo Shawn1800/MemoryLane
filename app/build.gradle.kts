@@ -1,9 +1,16 @@
+import java.util.Properties
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.kotlin.serialization)
 }
 
+val properties = Properties()
+val localPropsFile = rootProject.file("local.properties")
+if (localPropsFile.exists()) {
+    localPropsFile.inputStream().use { properties.load(it) }
+}
 android {
     namespace = "com.ghostbug.memorylane"
     compileSdk {
@@ -20,6 +27,15 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        val supabaseUrl = properties.getProperty("SUPABASE_URL") ?: ""
+        val supabaseKey = properties.getProperty("SUPABASE_PUBLISHABLE_KEY") ?: ""
+        val googleClientId = properties.getProperty("GOOGLE_CLIENT_ID") ?: ""
+
+        buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
+        buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"$supabaseKey\"")
+        buildConfigField("String", "GOOGLE_CLIENT_ID", "\"$googleClientId\"")
+
     }
 
     buildTypes {
@@ -35,6 +51,8 @@ android {
     }
     buildFeatures {
         compose = true
+        buildConfig = true
+
     }
 }
 
@@ -70,7 +88,17 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-navigation3")
 
     implementation("androidx.compose.material:material-icons-extended:<version>")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:<version>")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.11.0")
     implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.8.0")
+
+    implementation("io.github.jan-tennert.supabase:postgrest-kt:3.8.0")
+    implementation("io.github.jan-tennert.supabase:storage-kt:3.8.0")
+    implementation("io.github.jan-tennert.supabase:auth-kt:3.8.0")
+    implementation("io.github.jan-tennert.supabase:realtime-kt:3.8.0")
+
+
+    implementation("io.ktor:ktor-client-android:3.5.2")
+    implementation("io.ktor:ktor-client-core:3.5.2")
+    implementation("io.ktor:ktor-utils:3.5.2")
 
 }

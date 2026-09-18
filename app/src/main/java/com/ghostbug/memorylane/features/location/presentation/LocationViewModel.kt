@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+
 class LocationViewModel (
     private val locationUseCase: LocationUseCase
 ): ViewModel() {

@@ -5,7 +5,7 @@ import com.ghostbug.memorylane.features.location.data.repositoryImpl.LocationRep
 import com.ghostbug.memorylane.features.location.domain.repository.LocationRepository
 import org.koin.dsl.module
 
-val dataModule = module {
+val locationDataModule = module {
     // androidContext() gives Koin the app Context, which LocationDataSource needs.
     single { LocationDataSource() }
 
