@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">MemoryLane</string>
+    <string name="sign_up">Log in or sign up</string>
+    <string name="memorylane_web_client_id">715850337174-1pqlbuvge12eop8td7gtork1q18osf7v.apps.googleusercontent.com</string>
 </resources>

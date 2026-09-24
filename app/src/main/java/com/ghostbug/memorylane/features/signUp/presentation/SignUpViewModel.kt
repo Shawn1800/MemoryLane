@@ -1,16 +1,19 @@
 package com.ghostbug.memorylane.features.signUp.presentation
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.ghostbug.memorylane.core.auth.domain.repository.AuthRepository
+import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
+class SignUpViewModel(
+    private val authRepository: AuthRepository,
+): ViewModel() {
+
     private val _signUpState = MutableStateFlow(SignUpState())
     var signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
 
@@ -39,11 +42,15 @@ class SignUpViewModel(private val authRepository: AuthRepository): ViewModel() {
             }
 
 
-            is SignUpEvent.OnGoogleSignInClick -> {
-                viewModelScope.launch {
-                    authRepository.signInWithGoogle()
-                }
-            }
+//            is SignUpEvent.OnGoogleIdToken -> {
+//                viewModelScope.launch {
+//                    authRepository.signInWithGoogle(event.idToken , event.rawNonce)
+//                        .onSuccess { /* update state / navigate */ }
+//                        .onFailure { e -> /* update state with error */ }
+//                }
+//            }
+
+
 
             SignUpEvent.OnForgotPasswordClick -> TODO()
         }

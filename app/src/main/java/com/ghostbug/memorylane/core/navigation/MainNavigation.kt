@@ -16,6 +16,8 @@ import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.memorylane.MyApplication
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import com.ghostbug.memorylane.features.location.presentation.MapScreen
+import com.ghostbug.memorylane.features.signUp.presentation.SignUpRoute
+import com.ghostbug.memorylane.features.signUp.presentation.SignUpViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -25,12 +27,8 @@ fun MainNavigation(
     val context = LocalContext.current
     val app = context.applicationContext as MyApplication
 
-
-
     val locationViewModel : LocationViewModel = koinViewModel()
-
-
-
+    val signUpViewModel : SignUpViewModel = koinViewModel ()
 
     val navigationState = rememberNavigationState(
         startRoute = Route.LocationScreen,
@@ -81,6 +79,18 @@ fun MainNavigation(
                             locationViewModel = locationViewModel,
                         )
                     }
+                    entry <Route.SignUpScreen>{
+                        SignUpRoute (
+                           signUpViewModel = signUpViewModel,
+                            onSignUp = {
+                                navigator.navigate(Route.LocationScreen)
+                            },
+                            modifier = Modifier
+                        )
+                    }
+//                    entry<Route.ProfileScreen> {
+//
+//                    }
                 }
             )
         )

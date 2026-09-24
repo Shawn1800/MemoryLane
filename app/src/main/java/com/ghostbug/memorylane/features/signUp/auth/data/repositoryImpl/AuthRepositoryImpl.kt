@@ -1,17 +1,28 @@
-package com.ghostbug.memorylane.core.auth.data.repositoryImpl
+package com.ghostbug.memorylane.features.signUp.auth.data.repositoryImpl
 
-import com.ghostbug.memorylane.core.auth.domain.repository.AuthRepository
+import android.content.Context
+import android.content.MutableContextWrapper
+import android.util.Base64
+import androidx.credentials.CredentialManager
+import androidx.credentials.GetCredentialRequest
+import com.ghostbug.memorylane.BuildConfig
+import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
+import com.ghostbug.memorylane.features.signUp.auth.utils.GoogleSignUpUtils
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlin.coroutines.cancellation.CancellationException
 import com.ghostbug.memorylane.supabase
+import com.google.android.libraries.identity.googleid.GetGoogleIdOption
+import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
-import io.github.jan.supabase.auth.exception.AuthErrorCode
+import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
+import kotlinx.coroutines.coroutineScope
+import java.security.SecureRandom
 
 
 class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
@@ -56,16 +67,21 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
         }
     }
 
-    override suspend fun signInWithGoogle(): Result<Unit> {
-        return try {
-            supabase.auth.signInWith(Google)
-            Result.success(Unit)
-        } catch (e: CancellationException) {
-            throw e
-        } catch (e: Exception) {
-            Result.failure(e)
+    override suspend fun signInWithGoogle(idToken: String, nonce:String): Result<Unit> {
+             try {
+                 supabase.auth.signInWith(IDToken) {
+                     this.idToken = idToken
+                     provider = Google
+                     nonce = rawNonce
+                 }
+                 Result.success(Unit)
+             }  catch (e: CancellationException) {
+                throw e
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
         }
-    }
+
 
     // Function to check if the user's email exists in the public.users table
     override suspend fun isEmailInPublicUsersTable(email: String): Result<Unit> {
@@ -125,4 +141,10 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
             }
         }
     }
+}
+
+fun generateSecureRandomNonce(byteLength: Int = 32): String {
+    val randomBytes = ByteArray(byteLength)
+    SecureRandom().nextBytes(randomBytes)
+    return Base64.encodeToString(randomBytes, Base64.NO_WRAP or Base64.URL_SAFE or Base64.NO_PADDING)
 }

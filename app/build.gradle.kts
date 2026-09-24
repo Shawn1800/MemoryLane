@@ -31,10 +31,12 @@ android {
         val supabaseUrl = properties.getProperty("SUPABASE_URL") ?: ""
         val supabaseKey = properties.getProperty("SUPABASE_PUBLISHABLE_KEY") ?: ""
         val googleClientId = properties.getProperty("GOOGLE_CLIENT_ID") ?: ""
+        val webClientId = properties.getProperty("WEB_CLIENT_ID") ?: ""
 
         buildConfigField("String", "SUPABASE_URL", "\"$supabaseUrl\"")
         buildConfigField("String", "SUPABASE_PUBLISHABLE_KEY", "\"$supabaseKey\"")
         buildConfigField("String", "GOOGLE_CLIENT_ID", "\"$googleClientId\"")
+        buildConfigField("String", "WEB_CLIENT_ID", "\"$webClientId\"")
 
     }
 
@@ -65,6 +67,7 @@ dependencies {
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.googleid)
     testImplementation(libs.junit)
     androidTestImplementation(platform(libs.androidx.compose.bom))
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
@@ -100,5 +103,9 @@ dependencies {
     implementation("io.ktor:ktor-client-android:3.5.2")
     implementation("io.ktor:ktor-client-core:3.5.2")
     implementation("io.ktor:ktor-utils:3.5.2")
+
+    implementation("androidx.credentials:credentials:1.7.0-alpha03")
+    implementation("androidx.credentials:credentials-play-services-auth:1.7.0-alpha03")
+    implementation("com.google.android.libraries.identity.googleid:googleid:<latest version>")
 
 }
