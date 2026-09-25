@@ -12,20 +12,23 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.auth.providers.Google
 import io.github.jan.supabase.auth.providers.builtin.Email
 import kotlin.coroutines.cancellation.CancellationException
-import com.ghostbug.memorylane.supabase
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import io.github.jan.supabase.auth.OtpType
 import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.auth.providers.builtin.IDToken
 import io.github.jan.supabase.auth.providers.builtin.OTP
+import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.from
 import io.github.jan.supabase.postgrest.query.Columns
 import kotlinx.coroutines.coroutineScope
 import java.security.SecureRandom
 
 
-class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
+class AuthRepositoryImpl(
+    private val auth: Auth,
+    private val postgrest: Postgrest,
+) : AuthRepository {
 
     override suspend fun signUp(email: String, password: String): Result<Unit> {
         return try {
@@ -43,7 +46,7 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
 
     override  suspend fun signUpWithOtp(email:String):Result<Unit> {
         return try {
-            supabase.auth.signInWith(OTP) {
+            auth.signInWith(OTP) {
                 this.email = email
             }
             Result.success(Unit)
@@ -68,11 +71,11 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
     }
 
     override suspend fun signInWithGoogle(idToken: String, nonce:String): Result<Unit> {
-             try {
-                 supabase.auth.signInWith(IDToken) {
+          return try {
+                 auth.signInWith(IDToken) {
                      this.idToken = idToken
                      provider = Google
-                     nonce = rawNonce
+                     this.nonce = nonce
                  }
                  Result.success(Unit)
              }  catch (e: CancellationException) {
@@ -86,8 +89,7 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
     // Function to check if the user's email exists in the public.users table
     override suspend fun isEmailInPublicUsersTable(email: String): Result<Unit> {
         return try {
-            supabase
-                .from("users")
+            postgrest.from("users")
                 .select(Columns.list("email")) {
                     filter {
                         eq("email", email)
@@ -121,8 +123,8 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
                 this.email = email
                 this.password = password
             }
-            val session = supabase.auth.currentSessionOrNull()
-            val user = supabase.auth.retrieveUserForCurrentSession()
+            val session = auth.currentSessionOrNull()
+            val user = auth.retrieveUserForCurrentSession()
             if (session != null && user != null) {
                 Result.success(Unit)
             } else {
@@ -134,17 +136,11 @@ class AuthRepositoryImpl(private val auth: Auth) : AuthRepository {
         } catch (e: Exception) {
             if (e.message?.contains("Email not confirmed") == true) {
                 // If the email isn’t confirmed, trigger resend.
-                supabase.auth.resendEmail(OtpType.Email.SIGNUP, email)
+                auth.resendEmail(OtpType.Email.SIGNUP, email)
                 Result.failure(Exception("Email not verified. Verification email sent."))
             } else {
                 Result.failure(e)
             }
         }
     }
-}
-
-fun generateSecureRandomNonce(byteLength: Int = 32): String {
-    val randomBytes = ByteArray(byteLength)
-    SecureRandom().nextBytes(randomBytes)
-    return Base64.encodeToString(randomBytes, Base64.NO_WRAP or Base64.URL_SAFE or Base64.NO_PADDING)
 }

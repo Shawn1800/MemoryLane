@@ -24,14 +24,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun MainNavigation(
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val app = context.applicationContext as MyApplication
-
-    val locationViewModel : LocationViewModel = koinViewModel()
-    val signUpViewModel : SignUpViewModel = koinViewModel ()
 
     val navigationState = rememberNavigationState(
-        startRoute = Route.LocationScreen,
+        startRoute = Route.SignUpScreen,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
 
@@ -73,24 +68,25 @@ fun MainNavigation(
             },
 
             entries = navigationState.toEntries(
+
                 entryProvider {
-                    entry<Route.LocationScreen> {
-                        MapScreen(
-                            locationViewModel = locationViewModel,
-                        )
-                    }
                     entry <Route.SignUpScreen>{
+                        val signUpViewModel : SignUpViewModel = koinViewModel ()
                         SignUpRoute (
-                           signUpViewModel = signUpViewModel,
+                            signUpViewModel = signUpViewModel,
                             onSignUp = {
                                 navigator.navigate(Route.LocationScreen)
                             },
                             modifier = Modifier
                         )
                     }
-//                    entry<Route.ProfileScreen> {
-//
-//                    }
+                    entry<Route.LocationScreen> {
+                        val locationViewModel : LocationViewModel = koinViewModel()
+                        MapScreen(
+                            locationViewModel = locationViewModel,
+                        )
+                    }
+
                 }
             )
         )

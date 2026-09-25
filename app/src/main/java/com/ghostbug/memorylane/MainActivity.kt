@@ -23,12 +23,12 @@ class MainActivity : ComponentActivity() {
     }
 
 
-val supabase = createSupabaseClient(
-    supabaseUrl = BuildConfig.SUPABASE_URL,
-    supabaseKey = BuildConfig.SUPABASE_PUBLISHABLE_KEY
-) {
-    install(Auth)
-    install(Postgrest)
-
-}
+//val supabase = createSupabaseClient(
+//    supabaseUrl = BuildConfig.SUPABASE_URL,
+//    supabaseKey = BuildConfig.SUPABASE_PUBLISHABLE_KEY
+//) {
+//    install(Auth)
+//    install(Postgrest)
+//
+//}
 

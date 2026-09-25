@@ -78,7 +78,6 @@ dependencies {
 
     implementation("com.mapbox.maps:android-ndk27:11.25.0")
     implementation("com.mapbox.extension:maps-compose-ndk27:11.25.0")
-
     implementation("com.google.android.gms:play-services-location:21.0.1")
 
     implementation(platform(libs.koin.bom))

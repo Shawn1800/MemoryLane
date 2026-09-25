@@ -9,6 +9,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import kotlin.collections.copy
+
 
 class SignUpViewModel(
     private val authRepository: AuthRepository,
@@ -17,8 +20,11 @@ class SignUpViewModel(
     private val _signUpState = MutableStateFlow(SignUpState())
     var signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
 
-    fun onEvent(event: SignUpEvent) {
-        when (event) {
+    init {
+
+    }
+
+    fun onEvent(event: SignUpEvent) { when (event) {
             is SignUpEvent.OnEmailChanged ->{
 
                 _signUpState.update {
@@ -41,22 +47,35 @@ class SignUpViewModel(
                 }
             }
 
+            SignUpEvent.OnForgotPasswordClick -> {
+                TODO()
+            }
 
-//            is SignUpEvent.OnGoogleIdToken -> {
-//                viewModelScope.launch {
-//                    authRepository.signInWithGoogle(event.idToken , event.rawNonce)
-//                        .onSuccess { /* update state / navigate */ }
-//                        .onFailure { e -> /* update state with error */ }
-//                }
-//            }
+        is SignUpEvent.OnGoogleSignInResult -> {
+            viewModelScope.launch {
+                _signUpState.update {
+                    it.copy(isLoading = true, error = null)
+                }
+                authRepository.signInWithGoogle(event.idToken, event.rawNonce)
+                    .onSuccess {
+                        _signUpState.update {
+                            it.copy(
+                                isLoading = false,
+                                isSignUpSuccessful = true
+                            )
+                        }
 
+                    }.onFailure { e ->
+                        _signUpState.update {
+                            it.copy(
+                                isLoading = false,
+                                error = e.message
+                            )
+                        }
+                    }
+            }
 
-
-            SignUpEvent.OnForgotPasswordClick -> TODO()
         }
     }
-
-
-
-
+    }
 }
