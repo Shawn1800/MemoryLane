@@ -17,6 +17,7 @@ import com.ghostbug.memorylane.MyApplication
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import com.ghostbug.memorylane.features.location.presentation.MapScreen
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpRoute
+import com.ghostbug.memorylane.features.signUp.presentation.SignUpUiEvent
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpViewModel
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -33,9 +34,6 @@ fun MainNavigation(
     val navigator = remember(navigationState) {
         Navigator(navigationState)
     }
-
-
-
     Scaffold(
         modifier = modifier,
         bottomBar = {
@@ -74,6 +72,7 @@ fun MainNavigation(
                         val signUpViewModel : SignUpViewModel = koinViewModel ()
                         SignUpRoute (
                             signUpViewModel = signUpViewModel,
+                            uiEvent = signUpViewModel.signUpUiEvent,
                             onSignUp = {
                                 navigator.navigate(Route.LocationScreen)
                             },

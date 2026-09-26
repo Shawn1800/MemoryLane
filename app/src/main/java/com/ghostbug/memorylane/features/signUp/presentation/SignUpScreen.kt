@@ -12,6 +12,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -31,6 +32,7 @@ import com.ghostbug.memorylane.BuildConfig.WEB_CLIENT_ID
 import com.google.android.libraries.identity.googleid.GetGoogleIdOption
 import com.google.android.libraries.identity.googleid.GoogleIdTokenCredential
 import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.onSuccess
@@ -39,10 +41,18 @@ import kotlin.onSuccess
 @Composable
 fun SignUpRoute(
     onSignUp: () -> Unit ,
+    uiEvent: SharedFlow<SignUpUiEvent>,
     modifier: Modifier,
     signUpViewModel: SignUpViewModel = koinViewModel()
 ) {
     val state by signUpViewModel.signUpState.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        uiEvent.collect { event ->
+            when (event) {
+                is SignUpUiEvent.onSignUp -> onSignUp()
+            }
+        }
+    }
     SignUpScreen(state = state,
         onEvent = signUpViewModel::onEvent,
         modifier = modifier
@@ -104,8 +114,8 @@ fun GoogleSignInButton(
                 val hashedNonce = hashNonce(rawNonce)
                 val credentialManager = CredentialManager.create(context)
 
-                fun buildRequest(filterByAuthorized: Boolean) = GetCredentialRequest.Builder()
-                    .addCredentialOption(
+                fun buildRequest(filterByAuthorized: Boolean) =
+                    GetCredentialRequest.Builder().addCredentialOption(
                         GetGoogleIdOption.Builder()
                             .setFilterByAuthorizedAccounts(filterByAuthorized)
                             .setServerClientId(WEB_CLIENT_ID)
@@ -114,13 +124,14 @@ fun GoogleSignInButton(
                             .build()
                     )
                     .build()
+                val mutableContext = MutableContextWrapper(context)
 
                 scope.launch {
                     try {
                         val result = try {
-                            credentialManager.getCredential(context = context, request = buildRequest(true))
+                            credentialManager.getCredential(context = mutableContext, request = buildRequest(true))
                         } catch (e: NoCredentialException) {
-                            credentialManager.getCredential(context = context, request = buildRequest(false))
+                            credentialManager.getCredential(context = mutableContext, request = buildRequest(false))
                         }
                         val credential = result.credential
                         if (credential is CustomCredential &&

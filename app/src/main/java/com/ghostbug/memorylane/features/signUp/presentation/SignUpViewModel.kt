@@ -4,13 +4,14 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
-import kotlin.collections.copy
 
 
 class SignUpViewModel(
@@ -19,6 +20,10 @@ class SignUpViewModel(
 
     private val _signUpState = MutableStateFlow(SignUpState())
     var signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
+
+    private val _signUpUiEvent = MutableSharedFlow<SignUpUiEvent>()
+    var signUpUiEvent: SharedFlow<SignUpUiEvent> = _signUpUiEvent.asSharedFlow()
+
 
     init {
 
@@ -64,6 +69,7 @@ class SignUpViewModel(
                                 isSignUpSuccessful = true
                             )
                         }
+                        _signUpUiEvent.emit(SignUpUiEvent.onSignUp)
 
                     }.onFailure { e ->
                         _signUpState.update {
