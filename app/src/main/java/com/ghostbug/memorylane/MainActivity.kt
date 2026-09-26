@@ -4,9 +4,11 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import com.ghostbug.memorylane.features.Location.domain.LocationUseCase
-import com.ghostbug.memorylane.features.Location.presentation.LocationViewModel
-import com.ghostbug.memorylane.features.Location.presentation.MapScreen
+import com.ghostbug.memorylane.core.navigation.MainNavigation
+import io.github.jan.supabase.auth.Auth
+import io.github.jan.supabase.createSupabaseClient
+import io.github.jan.supabase.postgrest.Postgrest
+
 
 class MainActivity : ComponentActivity() {
 
@@ -15,11 +17,9 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MapScreen()
+            MainNavigation()
             }
         }
     }
-
-
 
 
