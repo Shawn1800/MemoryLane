@@ -87,15 +87,25 @@ class AuthRepositoryImpl(
 
 
     // Function to check if the user's email exists in the public.users table
-    override suspend fun isEmailInPublicUsersTable(email: String): Result<Unit> {
+//    override suspend fun isEmailInPublicUsersTable(email: String): Result<Unit> {
+//        return try {
+//            postgrest.from("users")
+//                .select(Columns.list("email")) {
+//                    filter {
+//                        eq("email", email)
+//                    }
+//                }
+//                .decodeList<Map<String, String>>()
+//            Result.success(Unit)
+//        } catch (e: CancellationException) {
+//            throw e
+//        } catch (e: Exception) {
+//            Result.failure(e)
+//        }
+//    }
+    override suspend fun isEmailInPublicUsersTable(): Result<Unit> {
         return try {
-            postgrest.from("users")
-                .select(Columns.list("email")) {
-                    filter {
-                        eq("email", email)
-                    }
-                }
-                .decodeList<Map<String, String>>()
+           val session= auth.currentSessionOrNull()
             Result.success(Unit)
         } catch (e: CancellationException) {
             throw e

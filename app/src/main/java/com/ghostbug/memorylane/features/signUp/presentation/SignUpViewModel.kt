@@ -25,9 +25,6 @@ class SignUpViewModel(
     var signUpUiEvent: SharedFlow<SignUpUiEvent> = _signUpUiEvent.asSharedFlow()
 
 
-    init {
-
-    }
 
     fun onEvent(event: SignUpEvent) { when (event) {
             is SignUpEvent.OnEmailChanged ->{

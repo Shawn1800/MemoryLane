@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entryProvider
@@ -16,18 +20,32 @@ import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.memorylane.MyApplication
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import com.ghostbug.memorylane.features.location.presentation.MapScreen
+import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpRoute
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpUiEvent
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpViewModel
+import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MainNavigation(
-    modifier: Modifier = Modifier
-) {
+    modifier: Modifier = Modifier,
+    authRepository: AuthRepository = koinInject()
 
+) {
+    var startRoute by remember { mutableStateOf<Route?>(null) }
+
+
+    LaunchedEffect(Unit) {
+        startRoute = if (authRepository.isEmailInPublicUsersTable().isSuccess) {
+            Route.LocationScreen
+        } else {
+            Route.SignUpScreen
+        }
+    }
+    val resolvedStartRoute = startRoute ?: return
     val navigationState = rememberNavigationState(
-        startRoute = Route.SignUpScreen,
+        startRoute = resolvedStartRoute,
         topLevelRoutes = TOP_LEVEL_DESTINATIONS.keys
     )
 
@@ -83,6 +101,7 @@ fun MainNavigation(
                         val locationViewModel : LocationViewModel = koinViewModel()
                         MapScreen(
                             locationViewModel = locationViewModel,
+                            onBack= navigator.clearCurrentStack()
                         )
                     }
 

@@ -1,5 +1,7 @@
 package com.ghostbug.memorylane.features.location.presentation
 
+import android.content.ContentValues.TAG
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.ghostbug.memorylane.features.location.domain.LocationUseCase
@@ -15,6 +17,9 @@ class LocationViewModel (
 ): ViewModel() {
    private val _state = MutableStateFlow(LocationState())
     val state: StateFlow<LocationState> = _state.asStateFlow()
+    init {
+        onEvent(LocationEvent.OnLocationButton)
+    }
 
     fun onEvent (event: LocationEvent) {
         when (event) {
@@ -25,11 +30,13 @@ class LocationViewModel (
                             loading = true
                         )
                     }
-                    val location = locationUseCase()
+                    val coordinates = locationUseCase()
+                    Log.d(TAG,"coordinates: $coordinates")
                     _state.update {
                         it.copy(
                             loading = false,
-                            location = location,
+                            longitude = coordinates?.longitude,
+                            latitude = coordinates?.latitude
                         )
                     }
 

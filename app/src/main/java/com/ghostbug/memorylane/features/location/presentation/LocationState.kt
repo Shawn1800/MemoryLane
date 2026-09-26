@@ -5,6 +5,7 @@ import com.ghostbug.memorylane.features.location.domain.model.Coordinates
 
 data class LocationState (
     val loading: Boolean= false,
-    val location: Coordinates? = null,
+    val longitude: Double? = null,
+    val latitude: Double? = null,
     val error: String? = null,
 )
