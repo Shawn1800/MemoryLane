@@ -104,7 +104,6 @@ fun MainNavigation(
                             onBack= navigator.clearCurrentStack()
                         )
                     }
-
                 }
             )
         )

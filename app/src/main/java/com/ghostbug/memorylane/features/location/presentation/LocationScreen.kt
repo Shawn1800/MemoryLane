@@ -2,20 +2,41 @@ package com.ghostbug.memorylane.features.location.presentation
 
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Path
+import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.translate
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -35,6 +56,20 @@ import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.io.path.Path
+import kotlin.io.path.moveTo
+
+private object NeoMarkerColors {
+    val cream = Color(0xFFF7F1E3)
+    val black = Color(0xFF141414)
+    val peach = Color(0xFFF3A989)
+    val mintGreen = Color(0xFFA9D6B0)
+    val gold = Color(0xFFF0C14E)
+}
+
+
+private val markerShape: Shape = RoundedCornerShape(14.dp)
+private val shadowOffset = 4.dp
 
 @Composable
 fun MapScreen(
@@ -119,7 +154,8 @@ fun MapContent(
                     },
 
                 ) {
-                    ViewAnnotationContent()
+//                    ViewAnnotationContent()
+                    MemoryMapMarker(photoUrl = "", isSelected = true, onClick = {})
                 }
 
             }
@@ -136,18 +172,103 @@ fun MapContent(
 }
 
 @Composable
- fun  ViewAnnotationContent() {
-    Text (
-        text = "Hello world dfgdfgd",
-        modifier = Modifier
-            .padding(3.dp)
-            .width(100.dp)
-            .height(60.dp)
-            .background(
-                Color.White
-            ),
-        textAlign = TextAlign.Center,
-        fontSize = 12.sp
+fun MemoryMapMarker(
+    photoUrl: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    dateLabel: String? = null,
+) {
+    val chromeSize by animateDpAsState(
+        targetValue = if (isSelected) 68.dp else 46.dp,
+        label = "markerSize"
+    )
+    val frameColor by animateColorAsState(
+        targetValue = if (isSelected) NeoMarkerColors.mintGreen else NeoMarkerColors.peach,
+        label = "markerFrame"
     )
 
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        if (isSelected && dateLabel != null) {
+            Box(
+                modifier = Modifier
+                    .offset(x = 2.dp, y = 2.dp)
+                    .background(NeoMarkerColors.black, RoundedCornerShape(6.dp))
+            ) {
+                Text(
+                    text = dateLabel,
+                    color = NeoMarkerColors.cream,
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 11.sp,
+                    modifier = Modifier
+                        .offset(x = (-2).dp, y = (-2).dp)
+                        .background(NeoMarkerColors.black, RoundedCornerShape(6.dp))
+                        .border(2.dp, NeoMarkerColors.black, RoundedCornerShape(6.dp))
+                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                )
+            }
+            Spacer(Modifier.padding(top = 4.dp))
+        }
+
+        // Photo chip: hard offset shadow behind + thick-bordered fill on top.
+        Box {
+            Box(
+                modifier = Modifier
+                    .offset(x = shadowOffset, y = shadowOffset)
+                    .size(chromeSize)
+                    .clip(markerShape)
+                    .background(NeoMarkerColors.black)
+            )
+            Box(
+                modifier = Modifier
+                    .size(chromeSize)
+                    .clip(markerShape)
+                    .background(frameColor)
+                    .border(2.5.dp, NeoMarkerColors.black, markerShape)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onClick
+                    )
+                    .padding(4.dp)
+            ) {
+//                AsyncImage(
+//                    model = photoUrl,
+//                    contentDescription = null,
+//                    contentScale = ContentScale.Crop,
+//                    modifier = Modifier
+//                        .size(chromeSize - 8.dp)
+//                        .clip(RoundedCornerShape(8.dp))
+//                )
+            }
+        }
+
+        // Tail — shadow triangle behind, bordered fill triangle on top.
+        Canvas(modifier = Modifier.size(width = 18.dp, height = 10.dp)) {
+            val tail = Path().apply {
+                moveTo(0f, 0f)
+                lineTo(size.width, 0f)
+                lineTo(size.width / 2f, size.height)
+                close()
+            }
+            translate(left = shadowOffset.toPx() * 0.6f, top = shadowOffset.toPx() * 0.6f) {
+                drawPath(tail, color = NeoMarkerColors.black)
+            }
+            drawPath(tail, color = frameColor)
+            drawPath(tail, color = NeoMarkerColors.black, style = Stroke(width = 3f))
+        }
+
+        // Exact anchor point — golden accent, black outline.
+        Box(
+            modifier = Modifier
+                .size(7.dp)
+                .background(NeoMarkerColors.gold, CircleShape)
+                .border(1.5.dp, NeoMarkerColors.black, CircleShape)
+        )
+    }
 }
+
+

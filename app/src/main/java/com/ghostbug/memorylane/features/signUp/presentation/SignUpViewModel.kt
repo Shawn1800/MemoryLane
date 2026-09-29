@@ -17,14 +17,11 @@ import kotlinx.coroutines.launch
 class SignUpViewModel(
     private val authRepository: AuthRepository,
 ): ViewModel() {
-
     private val _signUpState = MutableStateFlow(SignUpState())
     var signUpState: StateFlow<SignUpState> = _signUpState.asStateFlow()
 
     private val _signUpUiEvent = MutableSharedFlow<SignUpUiEvent>()
     var signUpUiEvent: SharedFlow<SignUpUiEvent> = _signUpUiEvent.asSharedFlow()
-
-
 
     fun onEvent(event: SignUpEvent) { when (event) {
             is SignUpEvent.OnEmailChanged ->{

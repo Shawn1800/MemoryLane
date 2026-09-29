@@ -5,7 +5,6 @@ sealed class SignUpEvent {
     data class OnPasswordChanged(val password :String) : SignUpEvent()
     object OnForgotPasswordClick : SignUpEvent()
     data object onSignUpClick : SignUpEvent()
-
     data class  OnGoogleSignInResult(val idToken :String, val rawNonce:String) : SignUpEvent()
 
 }
