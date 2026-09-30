@@ -10,7 +10,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.ghostbug.memorylane.core.navigation.MainNavigation
-import com.ghostbug.memorylane.features.camera.data.permissions.CameraPermissions.Companion.CAMERAX_PERMISSION
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest

@@ -1,7 +1,11 @@
 package com.ghostbug.memorylane.features.location.presentation
 
+import android.Manifest
+import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.ContentValues.TAG
 import android.util.Log
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.Canvas
@@ -25,7 +29,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -41,6 +47,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.ghostbug.memorylane.core.permissions.PermissionScreen
+import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
 import com.ghostbug.memorylane.features.location.domain.model.Coordinates
 import com.mapbox.geojson.Point
 import com.mapbox.maps.dsl.cameraOptions
@@ -55,6 +63,8 @@ import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.launch
 import org.koin.compose.viewmodel.koinViewModel
 import kotlin.io.path.Path
 import kotlin.io.path.moveTo
@@ -74,15 +84,37 @@ private val shadowOffset = 4.dp
 @Composable
 fun MapScreen(
     locationViewModel: LocationViewModel = koinViewModel(),
-    onBack: Unit
+    permissionsViewModel: PermissionsViewModel= koinViewModel(),
+    onBack: ()-> Unit
 ) {
-    val state by locationViewModel.state.collectAsStateWithLifecycle()
-    MapContent(
-        longitude = state.longitude,
-        latitude = state.latitude,
-        loading = state.loading,
-        onLocationClick = {locationViewModel.onEvent(LocationEvent.OnLocationButton)}
-    )
+    val permissionState by permissionsViewModel.permissionState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        permissionsViewModel.checkPermissions()
+    }
+
+    if (permissionState.hasLocationAccess) {
+        val state by locationViewModel.state.collectAsStateWithLifecycle()
+
+        LaunchedEffect(Unit) {
+            locationViewModel.onEvent(LocationEvent.OnLocationButton)
+        }
+
+        MapContent(
+            longitude = state.longitude,
+            latitude = state.latitude,
+            loading = state.loading,
+            onLocationClick = {
+                locationViewModel.onEvent(LocationEvent.OnLocationButton)}
+        )
+    } else {
+        PermissionScreen(
+            permissionsViewModel =  permissionsViewModel,
+            onNavigate = {
+            },
+            uiEvent = permissionsViewModel.uiEvent
+        )
+    }
 }
 
 @Composable

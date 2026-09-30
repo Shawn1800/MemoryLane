@@ -101,7 +101,7 @@ fun MainNavigation(
                         val locationViewModel : LocationViewModel = koinViewModel()
                         MapScreen(
                             locationViewModel = locationViewModel,
-                            onBack= navigator.clearCurrentStack()
+                            onBack= {  navigator.goBack()  }
                         )
                     }
                 }

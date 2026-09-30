@@ -1,6 +1,8 @@
 package com.ghostbug.memorylane
 
 import android.app.Application
+import com.ghostbug.memorylane.core.permissions.di.permissionDataModule
+import com.ghostbug.memorylane.core.permissions.di.permissionUiModule
 import com.ghostbug.memorylane.features.location.di.locationDataModule
 import com.ghostbug.memorylane.features.location.di.locationDomainModule
 import com.ghostbug.memorylane.features.location.di.locationUiModule
@@ -21,6 +23,7 @@ class MyApplication : Application() {
             // Without this line, Koin knows nothing — every inject/get would crash.
             modules(locationDataModule, locationDomainModule, locationUiModule)
             modules(authDataModule, authUiModule)
+            modules(permissionDataModule, permissionUiModule)
         }
     }
 }
