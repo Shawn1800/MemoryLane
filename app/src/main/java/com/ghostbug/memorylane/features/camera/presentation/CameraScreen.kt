@@ -1,35 +1,24 @@
 package com.ghostbug.memorylane.features.camera.presentation
 
-import android.Manifest
-import android.content.pm.PackageManager
-import androidx.camera.core.CameraSelector
-import androidx.camera.core.ImageCapture
-import androidx.camera.core.Preview
-import androidx.camera.core.imageCapture
-import androidx.camera.lifecycle.ProcessCameraProvider
+import android.graphics.Bitmap
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.ui.platform.LocalContext
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
-import androidx.lifecycle.LifecycleOwner
-import org.koin.compose.viewmodel.koinViewModel
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 
+@Composable
+fun CameraCapture() {
+    var  imageBitmap by  remember { mutableStateOf<Bitmap?>(null)}
 
-//@Composable
-//fun CameraRoute(
-//    cameraViewModel: CameraViewModel= koinViewModel ()
-//
-//) {
-//    val dialogQueue = cameraViewModel.visiblePermissionDialogQueue
-//    CameraScreen()
-//}
-//
-//
-//@Composable
-//fun CameraScreen( ) {
-//
-//
-//}
+    val  cameraLauncher = rememberLauncherForActivityResult(ActivityResultContracts.TakePicture()) {pictureTaken->
+        if (pictureTaken) {
+
+        }
+    }
+}
+
 
 
