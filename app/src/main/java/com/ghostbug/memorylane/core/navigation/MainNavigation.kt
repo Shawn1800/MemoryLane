@@ -18,6 +18,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.memorylane.MyApplication
+import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
+import com.ghostbug.memorylane.features.camera.presentation.CameraScreen
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import com.ghostbug.memorylane.features.location.presentation.MapScreen
 import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
@@ -34,6 +36,8 @@ fun MainNavigation(
 
 ) {
     var startRoute by remember { mutableStateOf<Route?>(null) }
+    val locationViewModel : LocationViewModel = koinViewModel()
+    val permissionsViewModel: PermissionsViewModel = koinViewModel()
 
 
     LaunchedEffect(Unit) {
@@ -98,10 +102,18 @@ fun MainNavigation(
                         )
                     }
                     entry<Route.LocationScreen> {
-                        val locationViewModel : LocationViewModel = koinViewModel()
+
                         MapScreen(
                             locationViewModel = locationViewModel,
                             onBack= {  navigator.goBack()  }
+                        )
+                    }
+                    entry<Route.CameraScreen> {
+                         CameraScreen(
+                             locationViewModel = locationViewModel,
+                             permissionsViewModel = permissionsViewModel,
+                             onCaptured = {},
+//                             onBack = navigator.navigate(Route.LocationScreen)
                         )
                     }
                 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -71,7 +72,7 @@ fun BottomNavigationBar (
 @Composable
 private fun NavTabItem(
     label: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: ImageVector,
     isActive: Boolean,
     onClick: () -> Unit
 ) {
@@ -99,6 +100,6 @@ private fun NavTabItem(
 
 private fun labelFor(route: NavKey): String = when (route) {
     is Route.LocationScreen    -> "Home"
-//    is Route.ProfileScreen -> "Profile"
+    is Route.CameraScreen -> "Camera"
     else                   -> ""
 }
