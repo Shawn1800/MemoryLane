@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.camera.data.cache
+package com.ghostbug.memorylane.features.camera.domain.cache
 
 import android.net.Uri
 import kotlinx.datetime.LocalDateTime
