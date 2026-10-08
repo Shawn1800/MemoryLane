@@ -42,9 +42,10 @@ fun CameraScreen(
             capturedUri = uri
             onCaptured(CapturedMemory(
                 uri=uri,
-                latitude = locationState.latitude,
-                longitude = locationState.longitude,
-                timeStamp = Clock.System.now()
+                imgLatitude = locationState.latitude,
+                imgLongitude = locationState.longitude,
+                capturedAt = Clock.System.now(),
+                caption = "will add caption later"
             ))
         }
     }

@@ -78,9 +78,16 @@ dependencies {
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 
-    implementation("com.mapbox.maps:android-ndk27:11.25.0")
-    implementation("com.mapbox.extension:maps-compose-ndk27:11.25.0")
+    implementation("com.mapbox.maps:android-ndk27:11.31.0")
+    implementation("com.mapbox.extension:maps-compose-ndk27:11.31.0")
     implementation("com.google.android.gms:play-services-location:21.0.1")
+
+    implementation("com.mapbox.search:autofill-ndk27:2.31.0")
+    implementation("com.mapbox.search:discover-ndk27:2.31.0")
+    implementation("com.mapbox.search:place-autocomplete-ndk27:2.31.0")
+    implementation("com.mapbox.search:offline-ndk27:2.31.0")
+    implementation("com.mapbox.search:mapbox-search-android-ndk27:2.31.0")
+    implementation("com.mapbox.search:mapbox-search-android-ui-ndk27:2.31.0")
 
     implementation(platform(libs.koin.bom))
     implementation(libs.koin.android)  // No version need
