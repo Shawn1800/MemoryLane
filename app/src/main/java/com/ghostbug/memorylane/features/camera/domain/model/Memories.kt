@@ -2,7 +2,7 @@ package com.ghostbug.memorylane.features.camera.domain.model
 
 import kotlin.time.Instant
 
-data class Memory(
+data class Memories(
     val id: String,
     val userId: String,
     val imagePath: String,

@@ -17,6 +17,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
 import com.ghostbug.memorylane.features.camera.domain.cache.CapturedMemory
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
+import org.koin.compose.viewmodel.koinViewModel
 import java.io.File
 import kotlin.time.Clock
 
@@ -24,15 +25,17 @@ import kotlin.time.Clock
 @Composable
 fun CameraScreen(
     onCaptured:(CapturedMemory)->Unit,
-    locationViewModel: LocationViewModel,
-    permissionsViewModel: PermissionsViewModel,
+    locationViewModel: LocationViewModel = koinViewModel(),
+    permissionsViewModel: PermissionsViewModel= koinViewModel(),
+    cameraViewModel: CameraViewModel = koinViewModel(),
     modifier: Modifier
 //    onBack: Unit
 ) {
-
+    val cameraState by cameraViewModel.state.collectAsStateWithLifecycle()
     val locationState by locationViewModel.state.collectAsStateWithLifecycle()
     var pendingUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var capturedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
+    var capturedMemory by rememberSaveable { mutableStateOf<CapturedMemory?>(null) }
     val context = LocalContext.current
     val  cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
@@ -40,17 +43,17 @@ fun CameraScreen(
         val uri = pendingUri
         if (pictureTaken && uri!=null) {
             capturedUri = uri
-            onCaptured(CapturedMemory(
+           val memory  =  CapturedMemory(
                 uri=uri,
                 imgLatitude = locationState.latitude,
                 imgLongitude = locationState.longitude,
                 capturedAt = Clock.System.now(),
                 caption = "will add caption later"
-            ))
+            )
+            capturedMemory = memory
+            onCaptured(memory)
         }
     }
-
-
     fun launchCamera() {
         val file = File.createTempFile("memory_",".jpeg", context.cacheDir)
         val uri  = FileProvider.getUriForFile(context,"${context.packageName}.fileProvider",file)
@@ -67,7 +70,11 @@ fun CameraScreen(
             onBack= { /*TODO*/ },
             imageUri = capturedUri,
             modifier = modifier,
-            onUpload = { /*TODO*/ }
+            onUpload = {
+                capturedMemory?.let { memory ->
+                    cameraViewModel.onEvent(CameraEvent.onUploadClicked(memory)) }
+                }
+
         )
     }
 
@@ -86,7 +93,6 @@ fun CameraScreen(
 //            Manifest.permission.ACCESS_COARSE_LOCATION
 //        ))
 //    }) { Text("Take photo") }
-
 }
 
 

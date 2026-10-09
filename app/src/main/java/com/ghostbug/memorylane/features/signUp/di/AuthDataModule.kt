@@ -9,6 +9,8 @@ import io.github.jan.supabase.auth.auth
 import io.github.jan.supabase.createSupabaseClient
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.postgrest.postgrest
+import io.github.jan.supabase.storage.Storage
+import io.github.jan.supabase.storage.storage
 import org.koin.dsl.module
 
 val authDataModule = module {
@@ -20,9 +22,11 @@ val authDataModule = module {
         ) {
             install(Postgrest)
             install(Auth)
+            install (Storage)
         }
     }
     single { get<SupabaseClient>().auth }
     single { get<SupabaseClient>().postgrest }
+    single {get<SupabaseClient>().storage}
     single<AuthRepository> { AuthRepositoryImpl(get(),get()) }
 }
