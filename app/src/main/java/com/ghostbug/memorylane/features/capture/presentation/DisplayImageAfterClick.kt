@@ -1,8 +1,7 @@
-package com.ghostbug.memorylane.features.camera.presentation
+package com.ghostbug.memorylane.features.capture.presentation
 
 import android.net.Uri
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn

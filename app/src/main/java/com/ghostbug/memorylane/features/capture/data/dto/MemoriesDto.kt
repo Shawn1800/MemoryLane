@@ -1,6 +1,5 @@
-package com.ghostbug.memorylane.features.camera.data.dto
+package com.ghostbug.memorylane.features.capture.data.dto
 
-import com.ghostbug.memorylane.features.camera.domain.model.Memories
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant

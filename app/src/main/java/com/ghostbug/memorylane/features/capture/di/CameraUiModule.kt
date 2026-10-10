@@ -1,6 +1,6 @@
-package com.ghostbug.memorylane.features.camera.di
+package com.ghostbug.memorylane.features.capture.di
 
-import com.ghostbug.memorylane.features.camera.presentation.CameraViewModel
+import com.ghostbug.memorylane.features.capture.presentation.CameraViewModel
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 

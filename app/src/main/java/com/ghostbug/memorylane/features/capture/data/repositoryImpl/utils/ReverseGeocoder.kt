@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.camera.data.repositoryImpl.utils
+package com.ghostbug.memorylane.features.capture.data.repositoryImpl.utils
 
 
 
@@ -23,7 +23,7 @@ class ReverseGeocoder {
             return best?.name?:"Unknown Location"
         } catch (e: Exception) {
             Log.e("ReverseGeocoder", "Exception during reverse geocoding", e)
-            "Unknown Location"
+            "Error during reverse geocoding"
         }
     }
 }

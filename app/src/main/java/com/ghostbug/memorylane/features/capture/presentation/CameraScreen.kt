@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.camera.presentation
+package com.ghostbug.memorylane.features.capture.presentation
 
 
 import android.net.Uri
@@ -15,7 +15,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.FileProvider
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
-import com.ghostbug.memorylane.features.camera.domain.cache.CapturedMemory
+import com.ghostbug.memorylane.features.capture.domain.cache.CapturedMemory
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import org.koin.compose.viewmodel.koinViewModel
 import java.io.File

@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.camera.presentation
+package com.ghostbug.memorylane.features.capture.presentation
 
 data class CameraState(
     var loading: Boolean = false,

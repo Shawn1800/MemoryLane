@@ -1,12 +1,8 @@
-package com.ghostbug.memorylane.features.camera.presentation
+package com.ghostbug.memorylane.features.capture.presentation
 
-import androidx.compose.runtime.MutableState
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.ghostbug.memorylane.features.camera.domain.cache.CapturedMemory
-import com.ghostbug.memorylane.features.camera.domain.repository.CameraManagerRepository
+import com.ghostbug.memorylane.features.capture.domain.repository.CameraManagerRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

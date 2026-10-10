@@ -1,4 +1,4 @@
-package com.ghostbug.memorylane.features.camera.domain.model
+package com.ghostbug.memorylane.features.capture.domain.model
 
 import kotlin.time.Instant
 
