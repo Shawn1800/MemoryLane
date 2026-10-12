@@ -6,6 +6,7 @@ data class Memories(
     val id: String,
     val userId: String,
     val imagePath: String,
+    val imageUrl : String,
     val caption: String,
     val imgLatitude: Double,
     val imgLongitude: Double,

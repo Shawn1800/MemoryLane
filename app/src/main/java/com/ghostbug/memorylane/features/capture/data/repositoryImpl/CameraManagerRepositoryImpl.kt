@@ -8,6 +8,7 @@ import com.ghostbug.memorylane.features.capture.data.repositoryImpl.utils.Revers
 import com.ghostbug.memorylane.features.capture.domain.cache.CapturedMemory
 import com.ghostbug.memorylane.features.capture.domain.model.Memories
 import com.ghostbug.memorylane.features.capture.domain.repository.CameraManagerRepository
+import com.mapbox.maps.extension.style.image.image
 import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
@@ -41,8 +42,6 @@ class CameraManagerRepositoryImpl(
 
         Log.e("CameraManagerRepositoryImpl", "SaveImageToDatabase: $placeName")
 
-
-
         val bytes =
             context.contentResolver.openInputStream(capturedMemory.uri)?.use { it.readBytes() }
                 ?: error("Could not read photo")
@@ -50,7 +49,6 @@ class CameraManagerRepositoryImpl(
         val path = "$userId/${Uuid.random()}.jpg"
         return try {
             val res = MemoryInsertDto(
-                userId = userId.toString(),
                 imagePath = path,
                 caption = capturedMemory.caption,
                 imgLatitude = lat,
@@ -78,7 +76,11 @@ class CameraManagerRepositoryImpl(
 
     override suspend fun getMemoriesFromDatabase(): Result<List<MemoriesDto>> {
         return try {
-            val memories = postgrest.from("memories_").select().decodeList<MemoriesDto>()
+            val dtos = postgrest.from("memories_").select().decodeList<MemoriesDto>()
+            val  memories = dtos.map { dto ->
+                val publicUrl = storage.from("memories").publicUrl(dto.imagePath)
+                dto.copy(imageUrl = publicUrl)
+            }
             Result.success(memories)
         } catch (e: CancellationException) {
             throw e

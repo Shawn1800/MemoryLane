@@ -4,4 +4,5 @@ import com.ghostbug.memorylane.features.capture.domain.cache.CapturedMemory
 
 sealed interface CameraEvent {
     data class onUploadClicked(val capturedMemory: CapturedMemory): CameraEvent
+    data object  getAllMemories  : CameraEvent
 }
