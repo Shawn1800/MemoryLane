@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -35,8 +36,9 @@ fun CameraScreen(
     val locationState by locationViewModel.state.collectAsStateWithLifecycle()
     var pendingUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var capturedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
-    var capturedMemory by rememberSaveable { mutableStateOf<CapturedMemory?>(null) }
+    var capturedMemory by remember { mutableStateOf<CapturedMemory?>(null) }
     val context = LocalContext.current
+
     val  cameraLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.TakePicture()
     ) { pictureTaken->

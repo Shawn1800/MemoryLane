@@ -22,16 +22,22 @@ class CameraViewModel(
 
     fun onEvent(event: CameraEvent) {
         when (event) {
-            is CameraEvent.onUploadClicked->  {
+            is CameraEvent.onUploadClicked ->  {
                 viewModelScope.launch {
-                   cameraManagerRepository.SaveImageToDatabase(event.capturedMemory)
                     _state.update {
                         it.copy(
                             loading = true
                         )
                     }
+                    cameraManagerRepository.SaveImageToDatabase(event.capturedMemory)
+                    _state.update {
+                        it.copy(
+                            loading = false
+                        )
+                    }
                 }
             }
+            is CameraEvent.getAllMemories -> TODO()
 
         }
     }

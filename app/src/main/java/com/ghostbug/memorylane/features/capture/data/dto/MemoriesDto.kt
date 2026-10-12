@@ -10,8 +10,8 @@ data  class MemoriesDto (
     val id: String,
     @SerialName("image_path")
     val imagePath: String,
-    @SerialName("image_url")
-    val imageUrl : String,
+    @kotlinx.serialization.Transient
+    val imageUrl : String="",
     @SerialName("caption")
     val caption: String?,
     @SerialName("img_latitude")

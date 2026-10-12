@@ -18,6 +18,7 @@ import androidx.compose.foundation.lazy.grid.itemsIndexed
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -25,6 +26,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import com.ghostbug.memorylane.features.gallery.presentation.GalleryEvent
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryState
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
 import io.github.jan.supabase.realtime.Column
@@ -34,8 +36,14 @@ import org.koin.core.component.getScopeId
 @Composable
 fun  GalleryScreen (
     galleryViewModel: GalleryViewModel = koinViewModel(),
+    onBack: () -> Unit
 )  {
     val  galleryState  by galleryViewModel.state.collectAsStateWithLifecycle()
+
+    LaunchedEffect(Unit) {
+        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
+    }
+
     GalleryContent(
         state= galleryState,
         modifier = Modifier
@@ -49,12 +57,15 @@ fun  GalleryContent(
 ) {
     Column(
         modifier = modifier
-            .fillMaxSize(),
+            .fillMaxSize()
+            .padding(top = 50.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ){
         Text("Your Memories")
-        Box(Modifier.fillMaxSize()) {
+        Box(Modifier.fillMaxSize()
+
+            ) {
                 if (state.memories.isEmpty()) {
                     Box(Modifier.fillMaxSize().padding(),
                         contentAlignment = Alignment.Center

@@ -35,11 +35,11 @@ class GalleryViewModel(
                     )
                 }
                     cameraManagerRepository.getMemoriesFromDatabase()
-                        .onSuccess {
+                        .onSuccess { memories ->
                             _state.update {
                                 it.copy(
                                     loading = false,
-                                    memories = _state.value.memories //it.memories
+                                    memories = memories
                                 )
                             }
                         }
@@ -47,7 +47,7 @@ class GalleryViewModel(
                             _state.update {
                                 it.copy(
                                     loading = false,
-                                    error = it.error
+                                    error = "failed to get memories"
                                 )
                             }
                         }

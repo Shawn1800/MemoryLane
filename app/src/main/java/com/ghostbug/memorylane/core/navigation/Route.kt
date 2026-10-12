@@ -12,4 +12,6 @@ sealed interface Route : NavKey {
 
     @Serializable
     data object CameraScreen :Route
+    @Serializable
+    data object GalleryScreen :Route
 }

@@ -3,6 +3,7 @@ package com.ghostbug.memorylane.features.location.presentation
 import android.Manifest
 import android.Manifest.permission.ACCESS_COARSE_LOCATION
 import android.content.ContentValues.TAG
+import android.graphics.drawable.Icon
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -24,7 +25,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.SegmentedButtonDefaults.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,6 +55,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.ghostbug.memorylane.core.permissions.PermissionScreen
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
 import com.ghostbug.memorylane.features.location.domain.model.Coordinates
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.geojson.Point
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
@@ -196,9 +202,14 @@ fun MapContent(
             onClick = onLocationClick,
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(16.dp)
+                .padding(bottom = 80.dp, end = 16.dp),
+            containerColor = Color(0xFF1B6E1B),
         ) {
-            Text("LOC")
+            Icon(
+                imageVector = Icons.Filled.LocationOn,
+                contentDescription = "location",
+                tint = Color.White
+            )
         }
     }
 }

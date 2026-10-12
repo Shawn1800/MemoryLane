@@ -14,10 +14,13 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
 import com.ghostbug.memorylane.features.capture.presentation.CameraScreen
+import com.ghostbug.memorylane.features.gallery.presentat.GalleryScreen
+import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import com.ghostbug.memorylane.features.location.presentation.MapScreen
 import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
@@ -35,6 +38,7 @@ fun MainNavigation(
     var startRoute by remember { mutableStateOf<Route?>(null) }
     val locationViewModel : LocationViewModel = koinViewModel()
     val permissionsViewModel: PermissionsViewModel = koinViewModel()
+    val  galleryViewModel: GalleryViewModel= koinViewModel ()
 
 
     LaunchedEffect(Unit) {
@@ -55,6 +59,7 @@ fun MainNavigation(
     }
     Scaffold(
         modifier = modifier,
+        containerColor= Color.Transparent,
         bottomBar = {
                 BottomNavigationBar(
                     selectedKey = navigationState.topLevelRoute,
@@ -63,12 +68,8 @@ fun MainNavigation(
                     }
                 )
         }
-    ) { innerPadding ->
+    ) {  paddingValues ->
         NavDisplay(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = innerPadding.calculateBottomPadding()),
-
             onBack = navigator::goBack,
 
             transitionSpec = {
@@ -112,6 +113,12 @@ fun MainNavigation(
                              onCaptured = {},
                              modifier = modifier
 //                             onBack = navigator.navigate(Route.LocationScreen)
+                        )
+                    }
+                    entry<Route.GalleryScreen> {
+                        GalleryScreen(
+                            galleryViewModel = galleryViewModel,
+                            onBack = {navigator.goBack()}
                         )
                     }
                 }

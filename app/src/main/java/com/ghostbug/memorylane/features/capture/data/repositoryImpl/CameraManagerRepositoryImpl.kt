@@ -13,6 +13,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.utils.io.CancellationException
+import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
 
@@ -25,11 +26,11 @@ class CameraManagerRepositoryImpl(
     private val storage: Storage
 ) : CameraManagerRepository {
 
-    val user = auth.currentSessionOrNull()?.user
-    val userId = user?.id
 
     @OptIn(ExperimentalUuidApi::class)
     override suspend fun SaveImageToDatabase(capturedMemory: CapturedMemory): Result<String> {
+        val user = auth.currentSessionOrNull()?.user
+        val userId = user?.id
 
         val lat = capturedMemory.imgLatitude
         val lng = capturedMemory.imgLongitude
@@ -47,7 +48,9 @@ class CameraManagerRepositoryImpl(
                 ?: error("Could not read photo")
 
         val path = "$userId/${Uuid.random()}.jpg"
+
         return try {
+            storage.from("memories").upload(path, bytes)
             val res = MemoryInsertDto(
                 imagePath = path,
                 caption = capturedMemory.caption,
@@ -56,7 +59,7 @@ class CameraManagerRepositoryImpl(
                 capturedAt = capturedMemory.capturedAt,
                 place = placeName,
             )
-            storage.from("memories").upload(path, bytes)
+
             postgrest.from("memories_").insert(res)
             Result.success("Picture successfully uploaded")
         } catch (e: CancellationException) {
@@ -78,7 +81,7 @@ class CameraManagerRepositoryImpl(
         return try {
             val dtos = postgrest.from("memories_").select().decodeList<MemoriesDto>()
             val  memories = dtos.map { dto ->
-                val publicUrl = storage.from("memories").publicUrl(dto.imagePath)
+                val publicUrl = storage.from("memories").createSignedUrl(dto.imagePath,3600.seconds)
                 dto.copy(imageUrl = publicUrl)
             }
             Result.success(memories)
