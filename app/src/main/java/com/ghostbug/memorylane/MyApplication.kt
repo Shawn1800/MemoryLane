@@ -1,6 +1,12 @@
 package com.ghostbug.memorylane
 
 import android.app.Application
+import com.ghostbug.memorylane.core.permissions.di.permissionDataModule
+import com.ghostbug.memorylane.core.permissions.di.permissionUiModule
+import com.ghostbug.memorylane.features.capture.di.CameraDataModule
+import com.ghostbug.memorylane.features.capture.di.CameraDomainModule
+import com.ghostbug.memorylane.features.capture.di.CameraUiModule
+import com.ghostbug.memorylane.features.gallery.di.GalleryUiModule
 import com.ghostbug.memorylane.features.location.di.locationDataModule
 import com.ghostbug.memorylane.features.location.di.locationDomainModule
 import com.ghostbug.memorylane.features.location.di.locationUiModule
@@ -10,6 +16,7 @@ import com.ghostbug.memorylane.features.signUp.di.authUiModule
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
+import org.koin.dsl.module
 
 class MyApplication : Application() {
 
@@ -21,6 +28,9 @@ class MyApplication : Application() {
             // Without this line, Koin knows nothing — every inject/get would crash.
             modules(locationDataModule, locationDomainModule, locationUiModule)
             modules(authDataModule, authUiModule)
+            modules(permissionDataModule, permissionUiModule)
+            modules(CameraDataModule, CameraDomainModule, CameraUiModule)
+            modules (GalleryUiModule)
         }
     }
 }

@@ -46,6 +46,7 @@ fun SignUpRoute(
     signUpViewModel: SignUpViewModel = koinViewModel()
 ) {
     val state by signUpViewModel.signUpState.collectAsStateWithLifecycle()
+
     LaunchedEffect(Unit) {
         uiEvent.collect { event ->
             when (event) {

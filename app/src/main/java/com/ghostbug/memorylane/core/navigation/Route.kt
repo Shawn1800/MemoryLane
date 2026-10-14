@@ -9,4 +9,9 @@ sealed interface Route : NavKey {
     data object LocationScreen : Route
     @Serializable
     data object SignUpScreen :Route
+
+    @Serializable
+    data object CameraScreen :Route
+    @Serializable
+    data object GalleryScreen :Route
 }
