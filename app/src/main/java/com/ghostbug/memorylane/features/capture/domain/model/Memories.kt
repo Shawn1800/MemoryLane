@@ -1,5 +1,6 @@
 package com.ghostbug.memorylane.features.capture.domain.model
 
+import com.ghostbug.memorylane.features.capture.data.dto.MemoriesDto
 import kotlin.time.Instant
 
 data class Memories(
@@ -14,3 +15,4 @@ data class Memories(
     val createdAt: Instant,
     val place: String,
 )
+

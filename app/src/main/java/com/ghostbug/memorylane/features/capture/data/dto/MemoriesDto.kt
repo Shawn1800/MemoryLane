@@ -1,5 +1,6 @@
 package com.ghostbug.memorylane.features.capture.data.dto
 
+import com.ghostbug.memorylane.features.capture.domain.model.Memories
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlin.time.Instant
@@ -41,3 +42,17 @@ data class MemoryInsertDto(
     @SerialName("place_name")
     val place: String?
 )
+fun MemoriesDto.toDomain(): Memories {
+    return Memories(
+        id = id,
+        userId = "",
+        imagePath = imagePath,
+        imageUrl = imageUrl,
+        caption = caption ?: "",
+        imgLatitude = imgLatitude ?: 0.0,
+        imgLongitude = imgLongitude ?: 0.0,
+        capturedAt = capturedAt,
+        createdAt = createdAt,
+        place = place ?: ""
+    )
+}

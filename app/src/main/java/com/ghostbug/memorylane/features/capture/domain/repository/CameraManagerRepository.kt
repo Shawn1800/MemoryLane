@@ -7,5 +7,5 @@ import com.ghostbug.memorylane.features.capture.domain.model.Memories
 interface CameraManagerRepository{
     suspend fun SaveImageToDatabase(capturedMemory: CapturedMemory): Result<String>
     suspend fun DeleteImageFromDatabase(path:String): Result<Unit>
-    suspend fun getMemoriesFromDatabase(): Result<List<MemoriesDto>>
+    suspend fun getMemoriesFromDatabase(): Result<List<Memories>>
 }

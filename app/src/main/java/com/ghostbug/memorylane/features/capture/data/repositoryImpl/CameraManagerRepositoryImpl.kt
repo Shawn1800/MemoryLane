@@ -4,6 +4,7 @@ import android.content.Context
 import android.util.Log
 import com.ghostbug.memorylane.features.capture.data.dto.MemoriesDto
 import com.ghostbug.memorylane.features.capture.data.dto.MemoryInsertDto
+import com.ghostbug.memorylane.features.capture.data.dto.toDomain
 import com.ghostbug.memorylane.features.capture.data.repositoryImpl.utils.ReverseGeocoder
 import com.ghostbug.memorylane.features.capture.domain.cache.CapturedMemory
 import com.ghostbug.memorylane.features.capture.domain.model.Memories
@@ -77,12 +78,12 @@ class CameraManagerRepositoryImpl(
        TODO()
     }
 
-    override suspend fun getMemoriesFromDatabase(): Result<List<MemoriesDto>> {
+    override suspend fun getMemoriesFromDatabase(): Result<List<Memories>> {
         return try {
             val dtos = postgrest.from("memories_").select().decodeList<MemoriesDto>()
             val  memories = dtos.map { dto ->
                 val publicUrl = storage.from("memories").createSignedUrl(dto.imagePath,3600.seconds)
-                dto.copy(imageUrl = publicUrl)
+                dto.copy(imageUrl = publicUrl).toDomain()
             }
             Result.success(memories)
         } catch (e: CancellationException) {

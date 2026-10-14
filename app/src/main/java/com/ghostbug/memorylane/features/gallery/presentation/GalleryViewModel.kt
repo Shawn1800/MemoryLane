@@ -2,6 +2,7 @@ package com.ghostbug.memorylane.features.gallery.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.ghostbug.memorylane.features.capture.data.dto.toDomain
 import com.ghostbug.memorylane.features.capture.domain.repository.CameraManagerRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow

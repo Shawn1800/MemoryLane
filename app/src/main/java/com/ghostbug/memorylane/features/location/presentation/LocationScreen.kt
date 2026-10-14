@@ -52,11 +52,16 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil3.compose.AsyncImage
 import com.ghostbug.memorylane.core.permissions.PermissionScreen
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
+import com.ghostbug.memorylane.features.capture.domain.model.Memories
+import com.ghostbug.memorylane.features.gallery.presentation.GalleryEvent
+import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
 import com.ghostbug.memorylane.features.location.domain.model.Coordinates
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.geojson.Point
+import com.mapbox.maps.ViewAnnotationAnchor
 import com.mapbox.maps.dsl.cameraOptions
 import com.mapbox.maps.extension.compose.MapEffect
 import com.mapbox.maps.extension.compose.MapboxMap
@@ -67,6 +72,8 @@ import com.mapbox.maps.plugin.PuckBearing
 import com.mapbox.maps.plugin.animation.MapAnimationOptions.Companion.mapAnimationOptions
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
+import com.mapbox.maps.plugin.viewport.ViewportStatus
+import com.mapbox.maps.viewannotation.annotationAnchor
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
 import kotlinx.coroutines.coroutineScope
@@ -91,12 +98,17 @@ private val shadowOffset = 4.dp
 fun MapScreen(
     locationViewModel: LocationViewModel = koinViewModel(),
     permissionsViewModel: PermissionsViewModel= koinViewModel(),
+    galleryViewModel   : GalleryViewModel = koinViewModel(),
     onBack: ()-> Unit
 ) {
     val permissionState by permissionsViewModel.permissionState.collectAsStateWithLifecycle()
+    val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
 
     LaunchedEffect(Unit) {
         permissionsViewModel.checkPermissions()
+    }
+    LaunchedEffect(Unit) {
+        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }
 
     if (permissionState.hasLocationAccess) {
@@ -111,7 +123,9 @@ fun MapScreen(
             latitude = state.latitude,
             loading = state.loading,
             onLocationClick = {
-                locationViewModel.onEvent(LocationEvent.OnLocationButton)}
+                locationViewModel.onEvent(LocationEvent.OnLocationButton)},
+            memories = galleryState.memories
+
         )
     } else {
         PermissionScreen(
@@ -128,7 +142,8 @@ fun MapContent(
     longitude: Double?,
     latitude: Double?,
     loading: Boolean,
-    onLocationClick: () -> Unit
+    onLocationClick: () -> Unit,
+    memories : List<Memories>
 ) {
      Log.d(TAG,"MapContent12:lat=$latitude,long=$longitude")
     val mapViewportState = rememberMapViewportState {
@@ -176,26 +191,30 @@ fun MapContent(
                     enabled = true
                     puckBearing = PuckBearing.HEADING
                     puckBearingEnabled = true
-                    pulsingEnabled=true
-                    showAccuracyRing =true
+                    pulsingEnabled = true
+                    showAccuracyRing = true
 
                 }
                 mapViewportState.transitionToFollowPuckState()
             }
-            val lat =latitude
-            val lng =longitude
-            if (lat != null && lng != null) {
-                ViewAnnotation(
-                    options = viewAnnotationOptions {
-                        geometry(Point.fromLngLat(lng ,lat))
-                        allowOverlapWithPuck(true)
-                    },
+            memories.forEach { memory ->
+                val lat = latitude
+                val lng = longitude
+                if (lat != null && lng != null) {
+                    ViewAnnotation(
+                        options = viewAnnotationOptions {
+                            geometry(Point.fromLngLat(lng, lat))
+                            allowOverlapWithPuck(true)
+                            annotationAnchor {
+                                anchor(ViewAnnotationAnchor.BOTTOM)
+                            }
+                        },
+                    ) {
 
-                ) {
-//                    ViewAnnotationContent()
-                    MemoryMapMarker(photoUrl = "", isSelected = true, onClick = {})
+                        MemoryMapMarker(photoUrl = memory.imageUrl, isSelected = true, onClick = {})
+                    }
+
                 }
-
             }
         }
         FloatingActionButton(
@@ -216,7 +235,7 @@ fun MapContent(
 
 @Composable
 fun MemoryMapMarker(
-    photoUrl: String,
+    photoUrl: String ,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
@@ -278,14 +297,14 @@ fun MemoryMapMarker(
                     )
                     .padding(4.dp)
             ) {
-//                AsyncImage(
-//                    model = photoUrl,
-//                    contentDescription = null,
-//                    contentScale = ContentScale.Crop,
-//                    modifier = Modifier
-//                        .size(chromeSize - 8.dp)
-//                        .clip(RoundedCornerShape(8.dp))
-//                )
+                AsyncImage(
+                    model = photoUrl,
+                    contentDescription = null,
+                    contentScale = ContentScale.Crop,
+                    modifier = Modifier
+                        .size(chromeSize - 8.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                )
             }
         }
 
