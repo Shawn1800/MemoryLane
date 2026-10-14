@@ -97,9 +97,9 @@ private val shadowOffset = 4.dp
 @Composable
 fun MapScreen(
     locationViewModel: LocationViewModel = koinViewModel(),
-    permissionsViewModel: PermissionsViewModel= koinViewModel(),
-    galleryViewModel   : GalleryViewModel = koinViewModel(),
-    onBack: ()-> Unit
+    permissionsViewModel: PermissionsViewModel = koinViewModel(),
+    galleryViewModel: GalleryViewModel = koinViewModel(),
+    onBack: () -> Unit
 ) {
     val permissionState by permissionsViewModel.permissionState.collectAsStateWithLifecycle()
     val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
@@ -123,15 +123,15 @@ fun MapScreen(
             latitude = state.latitude,
             loading = state.loading,
             onLocationClick = {
-                locationViewModel.onEvent(LocationEvent.OnLocationButton)},
+                locationViewModel.onEvent(LocationEvent.OnLocationButton)
+            },
             memories = galleryState.memories
 
         )
     } else {
         PermissionScreen(
-            permissionsViewModel =  permissionsViewModel,
-            onNavigate = {
-            },
+            permissionsViewModel = permissionsViewModel,
+            onNavigate = {},
             uiEvent = permissionsViewModel.uiEvent
         )
     }
@@ -143,9 +143,9 @@ fun MapContent(
     latitude: Double?,
     loading: Boolean,
     onLocationClick: () -> Unit,
-    memories : List<Memories>
+    memories: List<Memories>
 ) {
-     Log.d(TAG,"MapContent12:lat=$latitude,long=$longitude")
+    Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
             zoom(2.0)
@@ -155,7 +155,7 @@ fun MapContent(
         }
     }
     // Whenever the ViewModel produces a new location, fly the camera to it.
-    LaunchedEffect(longitude,latitude) {
+    LaunchedEffect(longitude, latitude) {
         val lat = latitude
         val lng = longitude  // needs to eb changed
         if (lat != null && lng != null) {
@@ -180,11 +180,9 @@ fun MapContent(
                 mapViewportState.easeTo(    // Smoothly move camera to
                     cameraOptions {         // with these settings:
                         center(clickedPoint)  // Center on the tapped location
-                    }
-                )
+                    })
                 true  // Return true = "I handled the click"
-            }
-        ) {
+            }) {
             MapEffect(Unit) { mapView ->
                 mapView.location.updateSettings {
                     locationPuck = createDefault2DPuck(withBearing = true)
@@ -235,15 +233,14 @@ fun MapContent(
 
 @Composable
 fun MemoryMapMarker(
-    photoUrl: String ,
+    photoUrl: String,
     isSelected: Boolean,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
     dateLabel: String? = null,
 ) {
     val chromeSize by animateDpAsState(
-        targetValue = if (isSelected) 68.dp else 46.dp,
-        label = "markerSize"
+        targetValue = if (isSelected) 68.dp else 46.dp, label = "markerSize"
     )
     val frameColor by animateColorAsState(
         targetValue = if (isSelected) NeoMarkerColors.mintGreen else NeoMarkerColors.peach,
@@ -251,8 +248,7 @@ fun MemoryMapMarker(
     )
 
     Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
     ) {
         if (isSelected && dateLabel != null) {
             Box(

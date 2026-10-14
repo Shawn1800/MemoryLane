@@ -1,5 +1,6 @@
 package com.ghostbug.memorylane.features.profile.data.remote
 
+import com.ghostbug.memorylane.features.profile.domain.model.Profile
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -32,3 +33,19 @@ class ProfileDto(
     @SerialName("profile_pic")
     val profilePic: String? = null,
 )
+fun ProfileDto.toDomain(): Profile {
+    return Profile (
+        userId = userId,
+        email = email,
+        name = name,
+        userName = userName,
+        bio = bio,
+        invitedBy = invitedBy,
+        inviteCode = inviteCode,
+        inviteCount = inviteCount,
+        accountCreatedAt = accountCreatedAt,
+        birthDate = birthDate,
+        phoneNumber = phoneNumber,
+        profilePic = profilePic
+    )
+}
