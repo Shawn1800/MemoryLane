@@ -10,6 +10,9 @@ import com.ghostbug.memorylane.features.gallery.di.GalleryUiModule
 import com.ghostbug.memorylane.features.location.di.locationDataModule
 import com.ghostbug.memorylane.features.location.di.locationDomainModule
 import com.ghostbug.memorylane.features.location.di.locationUiModule
+import com.ghostbug.memorylane.features.profile.di.ProfileDataModule
+import com.ghostbug.memorylane.features.profile.di.ProfileDomainModule
+import com.ghostbug.memorylane.features.profile.di.ProfileUiModule
 import com.ghostbug.memorylane.features.signUp.di.authDataModule
 import com.ghostbug.memorylane.features.signUp.di.authUiModule
 
@@ -31,6 +34,7 @@ class MyApplication : Application() {
             modules(permissionDataModule, permissionUiModule)
             modules(CameraDataModule, CameraDomainModule, CameraUiModule)
             modules (GalleryUiModule)
+            modules(ProfileDataModule, ProfileDomainModule, ProfileUiModule)
         }
     }
 }

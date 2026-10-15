@@ -7,7 +7,7 @@ import kotlinx.serialization.Serializable
 import kotlin.time.Instant
 
 @Serializable
-class ProfileDto(
+data class ProfileDto(
     @SerialName("user_id")
     val userId: String,
     @SerialName("email")
@@ -36,7 +36,6 @@ class ProfileDto(
 fun ProfileDto.toDomain(): Profile {
     return Profile (
         userId = userId,
-        email = email,
         name = name,
         userName = userName,
         bio = bio,
@@ -49,3 +48,17 @@ fun ProfileDto.toDomain(): Profile {
         profilePic = profilePic
     )
 }
+
+@Serializable
+data class ProfileInsertDto(
+    @SerialName("name")
+    val name: String = "",
+    @SerialName("username")
+    val userName: String = "",
+    @SerialName("bio")
+    val bio: String? = null,
+    @SerialName("birth_date")
+    val birthDate: LocalDate? = null, // Correctly serializes to "birth_date"
+    @SerialName("profile_pic")
+    val profilePic: String? = null,
+)

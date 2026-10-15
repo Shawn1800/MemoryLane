@@ -4,8 +4,7 @@ import kotlinx.datetime.LocalDate
 import kotlin.time.Instant
 
 data class Profile(
-    val userId: String,
-    val email: String,
+    val userId: String="",
     val name: String = "",
     val userName: String = "",
     val bio: String? = null,

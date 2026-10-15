@@ -73,6 +73,8 @@ import com.mapbox.maps.plugin.animation.MapAnimationOptions.Companion.mapAnimati
 import com.mapbox.maps.plugin.locationcomponent.createDefault2DPuck
 import com.mapbox.maps.plugin.locationcomponent.location
 import com.mapbox.maps.plugin.viewport.ViewportStatus
+import com.mapbox.maps.plugin.viewport.data.FollowPuckViewportStateOptions
+import com.mapbox.maps.plugin.viewport.state.FollowPuckViewportState
 import com.mapbox.maps.viewannotation.annotationAnchor
 import com.mapbox.maps.viewannotation.geometry
 import com.mapbox.maps.viewannotation.viewAnnotationOptions
@@ -107,6 +109,7 @@ fun MapScreen(
     LaunchedEffect(Unit) {
         permissionsViewModel.checkPermissions()
     }
+
     LaunchedEffect(Unit) {
         galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }
@@ -156,12 +159,13 @@ fun MapContent(
     }
     // Whenever the ViewModel produces a new location, fly the camera to it.
     LaunchedEffect(longitude, latitude) {
+        Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
         val lat = latitude
         val lng = longitude  // needs to eb changed
         if (lat != null && lng != null) {
             mapViewportState.flyTo(
                 cameraOptions {
-                    center(Point.fromLngLat(lng, lat))
+                    center(Point.fromLngLat(lng,lat ))
                     zoom(15.0)
                 },
                 mapAnimationOptions {
@@ -193,7 +197,11 @@ fun MapContent(
                     showAccuracyRing = true
 
                 }
-                mapViewportState.transitionToFollowPuckState()
+                mapViewportState.transitionToFollowPuckState(
+                    FollowPuckViewportStateOptions.Builder()
+                        .zoom(15.0)
+                        .build()
+                )
             }
             memories.forEach { memory ->
                 val lat = latitude
