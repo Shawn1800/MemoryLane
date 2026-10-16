@@ -55,9 +55,13 @@ fun OnboardingScreen1(
 
     LaunchedEffect(Unit) {
         profileViewModel.uiEvent.collect { uiEvent ->
+            android.util.Log.d("OnboardingScreen1", "Received UI event: $uiEvent")
             when (uiEvent) {
                 ProfileUiEvent.onNavHomeSceen,
-                ProfileUiEvent.onNext -> onNext()
+                ProfileUiEvent.onNext -> {
+                    android.util.Log.d("OnboardingScreen1", "Navigating to LocationScreen via onNext()")
+                    onNext()
+                }
                 else -> Unit
             }
         }
@@ -66,6 +70,7 @@ fun OnboardingScreen1(
     OnBoardingScreenContent(
         state = profileState,
         event = profileViewModel::onEvent,
+        onNext = onNext
     )
 }
 
@@ -73,6 +78,7 @@ fun OnboardingScreen1(
 fun OnBoardingScreenContent(
     state: ProfileState,
     event: (ProfileEvent) -> Unit,
+    onNext: () -> Unit,
 ) {
     var showPicker by rememberSaveable { mutableStateOf(false) }
 
@@ -130,7 +136,7 @@ fun OnBoardingScreenContent(
 
         Button(
             onClick = {
-                event(ProfileEvent.onSave)
+                event(ProfileEvent.onSave) // Simply trigger the save event!
             },
             enabled = !state.loading &&
                     state.name.isNotBlank() &&

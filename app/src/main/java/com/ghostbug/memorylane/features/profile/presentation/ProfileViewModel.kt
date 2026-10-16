@@ -64,14 +64,17 @@ class ProfileViewModel (
                         Profile(
                             name = current.name,
                             userName = current.username,
-                            birthDate = current.dob
+                            birthDate = current.dob,
                         )
                     )
                         .onSuccess {
+                            android.util.Log.d("ProfileViewModel", "insertProfile succeeded! Navigating...")
+                            _state.update { it.copy(loading = false) }
                             _uiEvent.emit(ProfileUiEvent.onNavHomeSceen)
                         }.onFailure { e ->
                             _state.update {
                                 it.copy(
+                                    loading = false,
                                     error = e.message ?: "Unknown Error"
                                 )
                             }

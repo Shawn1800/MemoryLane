@@ -34,11 +34,7 @@ class ProfileRepositoryImpl (
                 birthDate = profile.birthDate,
                 profilePic = profile.profilePic?:avatarUrl,
             )
-            ) {
-                filter {
-                    eq(USERID,user.id)
-                }
-            }
+            )
                 Result.success(Unit)
             }  catch (e: CancellationException)   {
                 throw e

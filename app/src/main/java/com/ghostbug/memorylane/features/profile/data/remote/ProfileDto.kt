@@ -17,21 +17,21 @@ data class ProfileDto(
     @SerialName("username")
     val userName: String = "",
     @SerialName("bio")
-    val bio: String? = null,
+    val bio: String? ,
     @SerialName("invited_by")
-    val invitedBy: String? = null,
+    val invitedBy: String?=null,
     @SerialName("invite_code")
-    val inviteCode: String = "",
+    val inviteCode: Int?=0,
     @SerialName("invite_count")
-    val inviteCount: Int = 0,
+    val inviteCount: Int? = 0,
     @SerialName("acc_created_at")
-    val accountCreatedAt: Instant? = null,
+    val accountCreatedAt: Instant? ,
     @SerialName("birth_date")
-    val birthDate: LocalDate? = null,
+    val birthDate: LocalDate? ,
     @SerialName("phone_no")
-    val phoneNumber: String? = null,
+    val phoneNumber: String? ,
     @SerialName("profile_pic")
-    val profilePic: String? = null,
+    val profilePic: String? ,
 )
 fun ProfileDto.toDomain(): Profile {
     return Profile (
@@ -56,9 +56,9 @@ data class ProfileInsertDto(
     @SerialName("username")
     val userName: String = "",
     @SerialName("bio")
-    val bio: String? = null,
+    val bio: String? ,
     @SerialName("birth_date")
-    val birthDate: LocalDate? = null, // Correctly serializes to "birth_date"
+    val birthDate: LocalDate? , // Correctly serializes to "birth_date"
     @SerialName("profile_pic")
-    val profilePic: String? = null,
+    val profilePic: String? ,
 )

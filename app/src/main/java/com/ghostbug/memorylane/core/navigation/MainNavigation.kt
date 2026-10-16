@@ -129,6 +129,7 @@ fun MainNavigation(
                     entry<Route.onBoardingScreen1> {
                         OnboardingScreen1(
                             onNext = {
+                                navigator.clearAll()
                                 navigator.navigate(Route.LocationScreen)
                             },
                             profileViewModel = profileViewModel
