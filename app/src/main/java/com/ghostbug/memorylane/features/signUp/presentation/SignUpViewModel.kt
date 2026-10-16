@@ -76,6 +76,11 @@ class SignUpViewModel(
             }
 
         }
+        is SignUpEvent.SignOut -> {
+            viewModelScope.launch {
+                authRepository.signOut()
+            }
+        }
     }
     }
 }

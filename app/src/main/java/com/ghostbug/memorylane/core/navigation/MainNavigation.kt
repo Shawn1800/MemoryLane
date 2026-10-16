@@ -23,6 +23,9 @@ import com.ghostbug.memorylane.features.gallery.presentat.GalleryScreen
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
 import com.ghostbug.memorylane.features.location.presentation.MapScreen
+import com.ghostbug.memorylane.features.onboarding.OnboardingScreen1
+import com.ghostbug.memorylane.features.profile.presentation.ProfileScreen
+import com.ghostbug.memorylane.features.profile.presentation.ProfileViewModel
 import com.ghostbug.memorylane.features.signUp.auth.domain.repository.AuthRepository
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpRoute
 import com.ghostbug.memorylane.features.signUp.presentation.SignUpViewModel
@@ -39,6 +42,9 @@ fun MainNavigation(
     val locationViewModel : LocationViewModel = koinViewModel()
     val permissionsViewModel: PermissionsViewModel = koinViewModel()
     val  galleryViewModel: GalleryViewModel= koinViewModel ()
+    val profileViewModel: ProfileViewModel = koinViewModel ()
+    val signUpViewModel: SignUpViewModel = koinViewModel()
+
 
 
     LaunchedEffect(Unit) {
@@ -88,41 +94,57 @@ fun MainNavigation(
             entries = navigationState.toEntries(
 
                 entryProvider {
-                    entry <Route.SignUpScreen>{
-                        val signUpViewModel : SignUpViewModel = koinViewModel ()
-                        SignUpRoute (
+                    entry<Route.SignUpScreen> {
+                        val signUpViewModel: SignUpViewModel = koinViewModel()
+                        SignUpRoute(
                             signUpViewModel = signUpViewModel,
                             uiEvent = signUpViewModel.signUpUiEvent,
                             onSignUp = {
-                                navigator.navigate(Route.LocationScreen)
+                                navigator.navigate(Route.onBoardingScreen1)
                             },
                             modifier = Modifier
                         )
                     }
                     entry<Route.LocationScreen> {
-
                         MapScreen(
                             locationViewModel = locationViewModel,
-                            onBack= {  navigator.goBack()  }
+                            onBack = { navigator.goBack() }
                         )
                     }
                     entry<Route.CameraScreen> {
-                         CameraScreen(
-                             locationViewModel = locationViewModel,
-                             permissionsViewModel = permissionsViewModel,
-                             onCaptured = {},
-                             modifier = modifier
+                        CameraScreen(
+                            locationViewModel = locationViewModel,
+                            permissionsViewModel = permissionsViewModel,
+                            onCaptured = {},
+                            modifier = modifier
 //                             onBack = navigator.navigate(Route.LocationScreen)
                         )
                     }
                     entry<Route.GalleryScreen> {
                         GalleryScreen(
                             galleryViewModel = galleryViewModel,
-                            onBack = {navigator.goBack()}
+                            onBack = { navigator.goBack() }
+                        )
+                    }
+                    entry<Route.onBoardingScreen1> {
+                        OnboardingScreen1(
+                            onNext = {
+                                navigator.clearAll()
+                                navigator.navigate(Route.LocationScreen)
+                            },
+                            profileViewModel = profileViewModel
+                        )
+                    }
+                    entry<Route.ProfileScreen> {
+                        ProfileScreen(
+                            signUpViewModel = signUpViewModel,
+                            onSignOut = {
+                                navigator.clearAll()
+                                navigator.navigate(Route.SignUpScreen)
+                            }
                         )
                     }
                 }
-            )
-        )
+            )  )
     }
 }

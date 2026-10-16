@@ -9,6 +9,7 @@ val locationDataModule = module {
     // androidContext() gives Koin the app Context, which LocationDataSource needs.
     single { LocationDataSource() }
 
-    // Bind the interface to its implementation. get() resolves LocationDataSource above.
-    single<LocationRepository> { LocationRepositoryImpl(get()) }
+    single {
+        LocationRepositoryImpl(get())
+    }
 }

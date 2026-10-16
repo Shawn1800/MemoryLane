@@ -7,9 +7,10 @@ espressoCore = "3.5.1"
 lifecycleRuntimeKtx = "2.6.1"
 activityCompose = "1.8.0"
 kotlin = "2.3.0"
-composeBom = "2026.02.01"
+composeBom = "2026.09.00"
 koin-bom = "4.2.0"
 googleid = "1.2.1"
+material3 = "1.1.0-alpha03"
 
 
 [libraries]

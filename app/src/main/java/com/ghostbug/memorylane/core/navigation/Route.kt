@@ -14,4 +14,8 @@ sealed interface Route : NavKey {
     data object CameraScreen :Route
     @Serializable
     data object GalleryScreen :Route
+    @Serializable
+    data object onBoardingScreen1 :Route
+    @Serializable
+    data object ProfileScreen :Route
 }

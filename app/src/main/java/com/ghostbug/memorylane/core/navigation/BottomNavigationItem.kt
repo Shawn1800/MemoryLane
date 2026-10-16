@@ -13,5 +13,6 @@ data class BottomNavItem(val icon : ImageVector)
 val TOP_LEVEL_DESTINATIONS = mapOf(
     Route.LocationScreen    to BottomNavItem(icon = Icons.Default.Home),
     Route.CameraScreen to BottomNavItem(icon = Icons.Default.Camera),
-    Route.GalleryScreen to BottomNavItem(icon = Icons.Default.PhotoAlbum)
+    Route.GalleryScreen to BottomNavItem(icon = Icons.Default.PhotoAlbum),
+    Route.ProfileScreen to BottomNavItem(icon = Icons.Default.Person)
 )

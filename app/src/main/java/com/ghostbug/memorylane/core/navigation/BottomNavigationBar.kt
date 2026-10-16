@@ -146,6 +146,7 @@ private fun labelFor(route: NavKey): String = when (route) {
     is Route.LocationScreen -> "Home"
     is Route.CameraScreen   -> "Camera"
     is Route.GalleryScreen   -> "Memories"
+    is Route.ProfileScreen   -> "Profile"
     else                     -> ""
 }
 

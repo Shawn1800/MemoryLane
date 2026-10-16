@@ -22,9 +22,9 @@ class LocationDataSource {
         LocationProviderRequest.Builder()
             .interval(
                 IntervalSettings.Builder()
-                    .interval(0L)
-                    .minimumInterval(0L)
-                    .maximumInterval(0L)
+                    .interval(1000L)
+                    .minimumInterval(1000L)
+                    .maximumInterval(3000L)
                     .build()
             )
             .displacement(0F)
