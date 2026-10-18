@@ -29,8 +29,8 @@ fun CameraScreen(
     locationViewModel: LocationViewModel = koinViewModel(),
     permissionsViewModel: PermissionsViewModel= koinViewModel(),
     cameraViewModel: CameraViewModel = koinViewModel(),
-    modifier: Modifier
-//    onBack: Unit
+    modifier: Modifier,
+    onBack: Unit
 ) {
     val cameraState by cameraViewModel.state.collectAsStateWithLifecycle()
     val locationState by locationViewModel.state.collectAsStateWithLifecycle()

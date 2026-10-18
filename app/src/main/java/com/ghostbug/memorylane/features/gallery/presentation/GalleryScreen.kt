@@ -64,7 +64,6 @@ fun  GalleryContent(
     ){
         Text("Your Memories")
         Box(Modifier.fillMaxSize()
-
             ) {
                 if (state.memories.isEmpty()) {
                     Box(Modifier.fillMaxSize().padding(),

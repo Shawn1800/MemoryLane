@@ -116,8 +116,8 @@ fun MainNavigation(
                             locationViewModel = locationViewModel,
                             permissionsViewModel = permissionsViewModel,
                             onCaptured = {},
-                            modifier = modifier
-//                             onBack = navigator.navigate(Route.LocationScreen)
+                            modifier = modifier,
+                             onBack = navigator.navigate(Route.LocationScreen)
                         )
                     }
                     entry<Route.GalleryScreen> {

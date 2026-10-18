@@ -14,6 +14,7 @@ import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -48,7 +49,8 @@ fun BottomNavigationBar(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 16.dp),
+            .size(width = 200.dp, height = 150.dp)
+            .padding(horizontal = 12.dp, vertical = 35.dp),
         contentAlignment = Alignment.Center
     ) {
         StrideFloatingNav(
@@ -66,7 +68,7 @@ fun StrideFloatingNav(
 ) {
     Surface(
         shape = CircleShape,
-        color = Color(0xFFD4EDD4),
+        color = Color.White,
         shadowElevation = 12.dp,
         modifier = modifier
     ) {
@@ -130,7 +132,7 @@ fun StrideFloatingNav(
                         ) {
                             Text(
                                 text = label,
-                                style = MaterialTheme.typography.labelMedium,
+                                style = MaterialTheme.typography.labelLarge,
                                 color = MaterialTheme.colorScheme.onPrimary,
                                 textAlign = TextAlign.Center
                             )
