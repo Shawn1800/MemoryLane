@@ -27,13 +27,20 @@ import kotlin.time.Clock
 fun CameraScreen(
     onCaptured:(CapturedMemory)->Unit,
     locationViewModel: LocationViewModel = koinViewModel(),
-    permissionsViewModel: PermissionsViewModel= koinViewModel(),
     cameraViewModel: CameraViewModel = koinViewModel(),
     modifier: Modifier,
-    onBack: Unit
+    onBack: () -> Unit
 ) {
     val cameraState by cameraViewModel.state.collectAsStateWithLifecycle()
     val locationState by locationViewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        cameraViewModel.event.collect {
+            when (it) {
+                is CameraUiEvent.navToLocationScreen -> onBack()
+            }
+        }
+    }
+
     var pendingUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var capturedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var capturedMemory by remember { mutableStateOf<CapturedMemory?>(null) }
@@ -68,8 +75,8 @@ fun CameraScreen(
     }
 
     if (capturedUri!=null) {
-        DisplayImageAfterClick(
-            onBack= { /*TODO*/ },
+        DisplayImageAfterClickScreen(
+            onBack = onBack,
             imageUri = capturedUri,
             modifier = modifier,
             onUpload = {

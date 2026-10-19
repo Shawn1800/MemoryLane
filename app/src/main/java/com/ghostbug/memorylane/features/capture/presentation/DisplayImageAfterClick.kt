@@ -17,7 +17,7 @@ import coil3.compose.AsyncImage
 
 
 @Composable
-fun DisplayImageAfterClick(
+fun DisplayImageAfterClickScreen(
     onBack:()->Unit,
     imageUri: Uri?,
     modifier: Modifier,

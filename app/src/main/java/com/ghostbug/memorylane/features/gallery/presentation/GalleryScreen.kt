@@ -40,6 +40,7 @@ fun  GalleryScreen (
 )  {
     val  galleryState  by galleryViewModel.state.collectAsStateWithLifecycle()
 
+
     LaunchedEffect(Unit) {
         galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }

@@ -113,10 +113,7 @@ fun MapScreen(
 
     LaunchedEffect(Unit) {
         permissionsViewModel.checkPermissions()
-    }
-
-    LaunchedEffect(Unit) {
-        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
+//        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }
 
     if (permissionState.hasLocationAccess) {

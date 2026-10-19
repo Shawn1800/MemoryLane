@@ -17,7 +17,7 @@ class CameraViewModel(
     private val _state  = MutableStateFlow(CameraState())
     val state : StateFlow<CameraState> = _state.asStateFlow()
 
-    private val _event = MutableSharedFlow<CameraEvent>()
+    private val _event = MutableSharedFlow<CameraUiEvent>()
     val event = _event.asSharedFlow()
 
     fun onEvent(event: CameraEvent) {
@@ -35,6 +35,7 @@ class CameraViewModel(
                             loading = false
                         )
                     }
+                    _event.emit(CameraUiEvent.navToLocationScreen)
                 }
             }
             is CameraEvent.getAllMemories -> TODO()
