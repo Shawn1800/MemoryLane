@@ -17,7 +17,7 @@ class CameraViewModel(
     private val _state  = MutableStateFlow(CameraState())
     val state : StateFlow<CameraState> = _state.asStateFlow()
 
-    private val _event = MutableSharedFlow<CameraEvent>()
+    private val _event = MutableSharedFlow<CameraUiEvent>()
     val event = _event.asSharedFlow()
 
     fun onEvent(event: CameraEvent) {
@@ -32,13 +32,23 @@ class CameraViewModel(
                     cameraManagerRepository.SaveImageToDatabase(event.capturedMemory)
                     _state.update {
                         it.copy(
-                            loading = false
+                            loading = false,
+                            caption = ""
+                        )
+                    }
+                    _event.emit(CameraUiEvent.navToLocationScreen)
+                }
+            }
+            is CameraEvent.getAllMemories -> TODO()
+            is CameraEvent.onCaptionChanged -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            caption = event.caption
                         )
                     }
                 }
             }
-            is CameraEvent.getAllMemories -> TODO()
-
         }
     }
 

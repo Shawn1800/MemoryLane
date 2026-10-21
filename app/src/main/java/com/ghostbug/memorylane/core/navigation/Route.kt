@@ -18,4 +18,5 @@ sealed interface Route : NavKey {
     data object onBoardingScreen1 :Route
     @Serializable
     data object ProfileScreen :Route
+    data object DisplayImageAfterClickScreen :Route
 }

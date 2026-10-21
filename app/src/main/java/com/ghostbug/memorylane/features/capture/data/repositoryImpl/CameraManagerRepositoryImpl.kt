@@ -14,6 +14,7 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.utils.io.CancellationException
+import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.ExperimentalUuidApi
 import kotlin.uuid.Uuid
@@ -82,7 +83,7 @@ class CameraManagerRepositoryImpl(
         return try {
             val dtos = postgrest.from("memories_").select().decodeList<MemoriesDto>()
             val  memories = dtos.map { dto ->
-                val publicUrl = storage.from("memories").createSignedUrl(dto.imagePath,3600.seconds)
+                val publicUrl = storage.from("memories").createSignedUrl(dto.imagePath,15.minutes)
                 dto.copy(imageUrl = publicUrl).toDomain()
             }
             Result.success(memories)

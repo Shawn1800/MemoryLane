@@ -1,4 +1,6 @@
 package com.ghostbug.memorylane.features.capture.presentation
 
-class CameraUiEvent {
+sealed interface CameraUiEvent {
+    data object navToLocationScreen : CameraUiEvent
 }
+

@@ -9,6 +9,9 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -30,6 +33,7 @@ import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,6 +44,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
@@ -108,10 +113,7 @@ fun MapScreen(
 
     LaunchedEffect(Unit) {
         permissionsViewModel.checkPermissions()
-    }
-
-    LaunchedEffect(Unit) {
-        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
+//        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }
 
     if (permissionState.hasLocationAccess) {
@@ -129,7 +131,6 @@ fun MapScreen(
                 locationViewModel.onEvent(LocationEvent.OnLocationButton)
             },
             memories = galleryState.memories
-
         )
     } else {
         PermissionScreen(
@@ -204,8 +205,8 @@ fun MapContent(
                 )
             }
             memories.forEach { memory ->
-                val lat = latitude
-                val lng = longitude
+                val lat = memory.imgLatitude
+                val lng = memory.imgLongitude
                 if (lat != null && lng != null) {
                     ViewAnnotation(
                         options = viewAnnotationOptions {
@@ -214,10 +215,19 @@ fun MapContent(
                             annotationAnchor {
                                 anchor(ViewAnnotationAnchor.BOTTOM)
                             }
+                            priority(10)
+                            allowOverlap(true)
+                            ignoreCameraPadding(false)
+                            allowZElevate(true)
+                            minZoom(10f)
+
                         },
                     ) {
-
-                        MemoryMapMarker(photoUrl = memory.imageUrl, isSelected = true, onClick = {})
+                        MemoryMarker(
+                            photoUrl = memory.imageUrl,
+                            isSelected = true,
+                            onClick = {}
+                        )
                     }
 
                 }
@@ -240,101 +250,101 @@ fun MapContent(
 }
 
 @Composable
-fun MemoryMapMarker(
+fun MemoryMarker(
     photoUrl: String,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
+    isSelected: Boolean = false,
     dateLabel: String? = null,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    val chromeSize by animateDpAsState(
-        targetValue = if (isSelected) 68.dp else 46.dp, label = "markerSize"
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.12f else 1f,
+        animationSpec = spring(dampingRatio = 0.65f, stiffness = 400f),
+        label = "markerScale"
     )
-    val frameColor by animateColorAsState(
-        targetValue = if (isSelected) NeoMarkerColors.mintGreen else NeoMarkerColors.peach,
-        label = "markerFrame"
+
+    val elevation by animateDpAsState(
+        targetValue = if (isSelected) 12.dp else 4.dp,
+        label = "markerElevation"
     )
 
     Column(
-        modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = modifier
+            .scale(scale)
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
     ) {
-        if (isSelected && dateLabel != null) {
-            Box(
-                modifier = Modifier
-                    .offset(x = 2.dp, y = 2.dp)
-                    .background(NeoMarkerColors.black, RoundedCornerShape(6.dp))
+        // Optional date chip (only when selected)
+        if (isSelected && !dateLabel.isNullOrBlank()) {
+            Surface(
+                shape = RoundedCornerShape(20.dp),
+                color = Color.Black.copy(alpha = 0.78f),
+                shadowElevation = 2.dp,
+                modifier = Modifier.padding(bottom = 6.dp)
             ) {
                 Text(
                     text = dateLabel,
-                    color = NeoMarkerColors.cream,
-                    fontWeight = FontWeight.Bold,
+                    color = Color.White,
                     fontSize = 11.sp,
-                    modifier = Modifier
-                        .offset(x = (-2).dp, y = (-2).dp)
-                        .background(NeoMarkerColors.black, RoundedCornerShape(6.dp))
-                        .border(2.dp, NeoMarkerColors.black, RoundedCornerShape(6.dp))
-                        .padding(horizontal = 8.dp, vertical = 3.dp)
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
                 )
             }
-            Spacer(Modifier.padding(top = 4.dp))
         }
 
-        // Photo chip: hard offset shadow behind + thick-bordered fill on top.
-        Box {
-            Box(
-                modifier = Modifier
-                    .offset(x = shadowOffset, y = shadowOffset)
-                    .size(chromeSize)
-                    .clip(markerShape)
-                    .background(NeoMarkerColors.black)
+        // Main photo card
+        Surface(
+            shape = RoundedCornerShape(14.dp),
+            shadowElevation = elevation,
+            color = Color.White,
+            border = BorderStroke(
+                width = if (isSelected) 2.5.dp else 1.5.dp,
+                color = if (isSelected) Color(0xFF1B6E1B) else Color.White
             )
+        ) {
             Box(
-                modifier = Modifier
-                    .size(chromeSize)
-                    .clip(markerShape)
-                    .background(frameColor)
-                    .border(2.5.dp, NeoMarkerColors.black, markerShape)
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = onClick
-                    )
-                    .padding(4.dp)
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.size(if (isSelected) 64.dp else 52.dp)
             ) {
                 AsyncImage(
                     model = photoUrl,
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier
-                        .size(chromeSize - 8.dp)
-                        .clip(RoundedCornerShape(8.dp))
+                        .fillMaxSize()
+                        .padding(3.dp)
+                        .clip(RoundedCornerShape(11.dp))
                 )
             }
         }
 
-        // Tail — shadow triangle behind, bordered fill triangle on top.
-        Canvas(modifier = Modifier.size(width = 18.dp, height = 10.dp)) {
-            val tail = Path().apply {
+        // Elegant pointer / tail
+        Canvas(
+            modifier = Modifier
+                .size(width = 16.dp, height = 9.dp)
+                .offset(y = (-1).dp)
+        ) {
+            val path = Path().apply {
                 moveTo(0f, 0f)
                 lineTo(size.width, 0f)
                 lineTo(size.width / 2f, size.height)
                 close()
             }
-            translate(left = shadowOffset.toPx() * 0.6f, top = shadowOffset.toPx() * 0.6f) {
-                drawPath(tail, color = NeoMarkerColors.black)
-            }
-            drawPath(tail, color = frameColor)
-            drawPath(tail, color = NeoMarkerColors.black, style = Stroke(width = 3f))
+            drawPath(
+                path = path,
+                color = if (isSelected) Color(0xFF1B6E1B) else Color.White
+            )
+            // subtle bottom shadow line
+            drawPath(
+                path = path,
+                color = Color.Black.copy(alpha = 0.12f),
+                style = Stroke(width = 1.5f)
+            )
         }
-
-        // Exact anchor point — golden accent, black outline.
-        Box(
-            modifier = Modifier
-                .size(7.dp)
-                .background(NeoMarkerColors.gold, CircleShape)
-                .border(1.5.dp, NeoMarkerColors.black, CircleShape)
-        )
     }
 }
-
 

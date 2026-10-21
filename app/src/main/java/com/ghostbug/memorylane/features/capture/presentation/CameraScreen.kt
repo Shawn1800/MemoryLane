@@ -27,13 +27,20 @@ import kotlin.time.Clock
 fun CameraScreen(
     onCaptured:(CapturedMemory)->Unit,
     locationViewModel: LocationViewModel = koinViewModel(),
-    permissionsViewModel: PermissionsViewModel= koinViewModel(),
     cameraViewModel: CameraViewModel = koinViewModel(),
-    modifier: Modifier
-//    onBack: Unit
+    modifier: Modifier,
+    onBack: () -> Unit
 ) {
     val cameraState by cameraViewModel.state.collectAsStateWithLifecycle()
     val locationState by locationViewModel.state.collectAsStateWithLifecycle()
+    LaunchedEffect(Unit) {
+        cameraViewModel.event.collect {
+            when (it) {
+                is CameraUiEvent.navToLocationScreen -> onBack()
+            }
+        }
+    }
+
     var pendingUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var capturedUri by rememberSaveable { mutableStateOf<Uri?>(null) }
     var capturedMemory by remember { mutableStateOf<CapturedMemory?>(null) }
@@ -50,10 +57,12 @@ fun CameraScreen(
                 imgLatitude = locationState.latitude,
                 imgLongitude = locationState.longitude,
                 capturedAt = Clock.System.now(),
-                caption = "will add caption later"
+                caption = cameraState.caption
             )
             capturedMemory = memory
             onCaptured(memory)
+        } else {
+            onBack()
         }
     }
     fun launchCamera() {
@@ -68,15 +77,17 @@ fun CameraScreen(
     }
 
     if (capturedUri!=null) {
-        DisplayImageAfterClick(
-            onBack= { /*TODO*/ },
+        DisplayImageAfterClickScreen(
+            onBack = onBack,
             imageUri = capturedUri,
             modifier = modifier,
+            caption = cameraState.caption,
+            onCaptionChanged = { newCaption ->
+                cameraViewModel.onEvent(CameraEvent.onCaptionChanged(newCaption))},
             onUpload = {
                 capturedMemory?.let { memory ->
-                    cameraViewModel.onEvent(CameraEvent.onUploadClicked(memory)) }
+                    cameraViewModel.onEvent(CameraEvent.onUploadClicked(memory.copy(caption = cameraState.caption))) }
                 }
-
         )
     }
 

@@ -19,6 +19,7 @@ import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
 import com.ghostbug.memorylane.features.capture.presentation.CameraScreen
+import com.ghostbug.memorylane.features.capture.presentation.DisplayImageAfterClickScreen
 import com.ghostbug.memorylane.features.gallery.presentat.GalleryScreen
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
 import com.ghostbug.memorylane.features.location.presentation.LocationViewModel
@@ -114,10 +115,9 @@ fun MainNavigation(
                     entry<Route.CameraScreen> {
                         CameraScreen(
                             locationViewModel = locationViewModel,
-                            permissionsViewModel = permissionsViewModel,
                             onCaptured = {},
-                            modifier = modifier
-//                             onBack = navigator.navigate(Route.LocationScreen)
+                            modifier = modifier,
+                            onBack = {navigator.navigate(Route.LocationScreen)}
                         )
                     }
                     entry<Route.GalleryScreen> {
@@ -142,6 +142,19 @@ fun MainNavigation(
                                 navigator.clearAll()
                                 navigator.navigate(Route.SignUpScreen)
                             }
+                        )
+                    }
+                    entry<Route.DisplayImageAfterClickScreen> {
+                        DisplayImageAfterClickScreen(
+                            onBack = {
+                                navigator.navigate(Route.LocationScreen)},
+                            imageUri = null,
+                            modifier = Modifier.fillMaxSize(),
+                            caption = "",
+                            onCaptionChanged = {},
+                            onUpload = {
+                                navigator.navigate(Route.LocationScreen)
+                            },
                         )
                     }
                 }
