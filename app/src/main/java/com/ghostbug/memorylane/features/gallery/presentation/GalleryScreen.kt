@@ -23,9 +23,11 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryEvent
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryState
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
@@ -86,13 +88,17 @@ fun  GalleryContent(
                         ){
                             AsyncImage(
                                 model = it.imageUrl,
+                                //have to understand this
+//                                    ImageRequest.Builder(LocalContext.current)
+//                                    .data(it.imageUrl)
+//                                    .memoryCacheKey(it.imagePath) // Uses constant "userId/photo.jpg" as cache key!
+//                                    .diskCacheKey(it.imagePath)   // Uses constant "userId/photo.jpg" as cache key!
+//                                    .build(),
                                 contentDescription = it.caption,
                                 contentScale = ContentScale.Crop,
-                                modifier = Modifier
-                                    .aspectRatio(1f)
-                                    .background(MaterialTheme.colorScheme.surfaceVariant)
-
+                                modifier = Modifier.aspectRatio(1f)
                             )
+
                         }
                     }
                 }

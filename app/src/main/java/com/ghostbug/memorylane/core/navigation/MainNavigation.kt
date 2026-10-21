@@ -39,7 +39,6 @@ fun MainNavigation(
     authRepository: AuthRepository = koinInject()
 
 ) {
-
     var startRoute by remember { mutableStateOf<Route?>(null) }
     val locationViewModel : LocationViewModel = koinViewModel()
     val permissionsViewModel: PermissionsViewModel = koinViewModel()
@@ -151,6 +150,8 @@ fun MainNavigation(
                                 navigator.navigate(Route.LocationScreen)},
                             imageUri = null,
                             modifier = Modifier.fillMaxSize(),
+                            caption = "",
+                            onCaptionChanged = {},
                             onUpload = {
                                 navigator.navigate(Route.LocationScreen)
                             },

@@ -131,7 +131,6 @@ fun MapScreen(
                 locationViewModel.onEvent(LocationEvent.OnLocationButton)
             },
             memories = galleryState.memories
-
         )
     } else {
         PermissionScreen(

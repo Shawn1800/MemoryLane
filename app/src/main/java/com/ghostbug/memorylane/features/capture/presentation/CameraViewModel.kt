@@ -32,14 +32,23 @@ class CameraViewModel(
                     cameraManagerRepository.SaveImageToDatabase(event.capturedMemory)
                     _state.update {
                         it.copy(
-                            loading = false
+                            loading = false,
+                            caption = ""
                         )
                     }
                     _event.emit(CameraUiEvent.navToLocationScreen)
                 }
             }
             is CameraEvent.getAllMemories -> TODO()
-
+            is CameraEvent.onCaptionChanged -> {
+                viewModelScope.launch {
+                    _state.update {
+                        it.copy(
+                            caption = event.caption
+                        )
+                    }
+                }
+            }
         }
     }
 

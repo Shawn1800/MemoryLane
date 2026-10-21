@@ -57,10 +57,12 @@ fun CameraScreen(
                 imgLatitude = locationState.latitude,
                 imgLongitude = locationState.longitude,
                 capturedAt = Clock.System.now(),
-                caption = "will add caption later"
+                caption = cameraState.caption
             )
             capturedMemory = memory
             onCaptured(memory)
+        } else {
+            onBack()
         }
     }
     fun launchCamera() {
@@ -79,11 +81,13 @@ fun CameraScreen(
             onBack = onBack,
             imageUri = capturedUri,
             modifier = modifier,
+            caption = cameraState.caption,
+            onCaptionChanged = { newCaption ->
+                cameraViewModel.onEvent(CameraEvent.onCaptionChanged(newCaption))},
             onUpload = {
                 capturedMemory?.let { memory ->
-                    cameraViewModel.onEvent(CameraEvent.onUploadClicked(memory)) }
+                    cameraViewModel.onEvent(CameraEvent.onUploadClicked(memory.copy(caption = cameraState.caption))) }
                 }
-
         )
     }
 
