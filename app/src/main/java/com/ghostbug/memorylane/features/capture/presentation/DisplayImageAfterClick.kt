@@ -1,17 +1,24 @@
 package com.ghostbug.memorylane.features.capture.presentation
 
 import android.net.Uri
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
 
@@ -61,14 +68,23 @@ fun ClickedImage(
     modifier: Modifier = Modifier,
     imageUri: Uri? = null
 ) {
-    if (imageUri != null) {
+    Box(
+        modifier = modifier
+            .fillMaxWidth()
+            .aspectRatio(4f / 5f)
+            .clip(RoundedCornerShape(36.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerHighest)
+
+    ) {
+        if (imageUri != null) {
             AsyncImage(
                 model = imageUri,
                 contentDescription = "Captured image",
-                modifier = Modifier.size(250.dp)
+                modifier = Modifier.fillMaxSize()
             )
         }
     }
+}
 
 @Composable
 fun UploadButton(
