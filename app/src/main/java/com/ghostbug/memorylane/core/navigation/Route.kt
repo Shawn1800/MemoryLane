@@ -18,5 +18,6 @@ sealed interface Route : NavKey {
     data object onBoardingScreen1 :Route
     @Serializable
     data object ProfileScreen :Route
-    data object DisplayImageAfterClickScreen :Route
+   @Serializable
+   data class GalleryImageViewerScreen(val memoryId :String) : Route
 }

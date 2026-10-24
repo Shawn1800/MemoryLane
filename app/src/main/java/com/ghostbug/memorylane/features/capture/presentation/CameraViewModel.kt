@@ -39,7 +39,9 @@ class CameraViewModel(
                     _event.emit(CameraUiEvent.navToLocationScreen)
                 }
             }
+
             is CameraEvent.getAllMemories -> TODO()
+
             is CameraEvent.onCaptionChanged -> {
                 viewModelScope.launch {
                     _state.update {
@@ -49,10 +51,6 @@ class CameraViewModel(
                     }
                 }
             }
+            }
         }
     }
-
-
-
-
-}

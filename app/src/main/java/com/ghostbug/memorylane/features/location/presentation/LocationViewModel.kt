@@ -17,6 +17,7 @@ class LocationViewModel (
 ): ViewModel() {
    private val _state = MutableStateFlow(LocationState())
     val state: StateFlow<LocationState> = _state.asStateFlow()
+
     init {
         onEvent(LocationEvent.OnLocationButton)
     }
@@ -41,8 +42,6 @@ class LocationViewModel (
                     }
 
                 }
-
-
             }
         }
     }

@@ -8,4 +8,5 @@ interface CameraManagerRepository{
     suspend fun SaveImageToDatabase(capturedMemory: CapturedMemory): Result<String>
     suspend fun DeleteImageFromDatabase(path:String): Result<Unit>
     suspend fun getMemoriesFromDatabase(): Result<List<Memories>>
+    suspend fun deleteMemory(memoryId: String): Result<Unit>
 }

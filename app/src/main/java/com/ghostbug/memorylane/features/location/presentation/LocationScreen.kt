@@ -30,9 +30,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
+import androidx.compose.material.icons.filled.MyLocation
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.FloatingActionButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButtonDefaults.Icon
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -40,6 +44,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -51,6 +56,7 @@ import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.drawscope.translate
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -58,12 +64,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
+import coil3.request.ImageRequest
+import coil3.request.crossfade
 import com.ghostbug.memorylane.core.permissions.PermissionScreen
 import com.ghostbug.memorylane.core.permissions.PermissionsViewModel
 import com.ghostbug.memorylane.features.capture.domain.model.Memories
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryEvent
+import com.ghostbug.memorylane.features.gallery.presentation.GalleryState
 import com.ghostbug.memorylane.features.gallery.presentation.GalleryViewModel
 import com.ghostbug.memorylane.features.location.domain.model.Coordinates
+import com.ghostbug.memorylane.features.profile.presentation.ProfileUiEvent
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.mapbox.geojson.Point
 import com.mapbox.maps.ViewAnnotationAnchor
@@ -106,15 +116,21 @@ fun MapScreen(
     locationViewModel: LocationViewModel = koinViewModel(),
     permissionsViewModel: PermissionsViewModel = koinViewModel(),
     galleryViewModel: GalleryViewModel = koinViewModel(),
-    onBack: () -> Unit
+    onBack: () -> Unit,
+
 ) {
+
     val permissionState by permissionsViewModel.permissionState.collectAsStateWithLifecycle()
     val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
 
+//    LaunchedEffect(Unit) {
+//        permissionsViewModel.checkPermissions()
+
+//    }
     LaunchedEffect(Unit) {
-        permissionsViewModel.checkPermissions()
-//        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
+        galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }
+
 
     if (permissionState.hasLocationAccess) {
         val state by locationViewModel.state.collectAsStateWithLifecycle()
@@ -123,6 +139,8 @@ fun MapScreen(
             locationViewModel.onEvent(LocationEvent.OnLocationButton)
         }
 
+
+
         MapContent(
             longitude = state.longitude,
             latitude = state.latitude,
@@ -130,7 +148,12 @@ fun MapScreen(
             onLocationClick = {
                 locationViewModel.onEvent(LocationEvent.OnLocationButton)
             },
-            memories = galleryState.memories
+            onDelete = { memoryId ->
+                galleryViewModel.onEvent(GalleryEvent.onDeleteMemory(memoryId))
+            },
+            galleryState = GalleryState(),
+            memories = galleryState.memories,
+            onBack = onBack,
         )
     } else {
         PermissionScreen(
@@ -139,7 +162,11 @@ fun MapScreen(
             uiEvent = permissionsViewModel.uiEvent
         )
     }
+
 }
+
+
+
 
 @Composable
 fun MapContent(
@@ -147,8 +174,22 @@ fun MapContent(
     latitude: Double?,
     loading: Boolean,
     onLocationClick: () -> Unit,
-    memories: List<Memories>
+    memories: List<Memories>,
+    galleryState: GalleryState,
+    onDelete : (String) -> Unit,
+    onBack: () -> Unit,
 ) {
+    // 1. State for currently selected memory tapped on map
+    var selectedMemory by remember { mutableStateOf<Memories?>(null) }
+
+    LaunchedEffect(memories) {
+        if (selectedMemory != null && memories.none { it.id == selectedMemory?.id }) {
+            selectedMemory = null
+        }
+    }
+
+
+
     Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
@@ -159,27 +200,41 @@ fun MapContent(
         }
     }
     // Whenever the ViewModel produces a new location, fly the camera to it.
-    LaunchedEffect(longitude, latitude) {
-        Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
-        val lat = latitude
-        val lng = longitude  // needs to eb changed
-        if (lat != null && lng != null) {
-            mapViewportState.flyTo(
-                cameraOptions {
-                    center(Point.fromLngLat(lng,lat ))
-                    zoom(15.0)
-                },
-                mapAnimationOptions {
-                    duration(3000)
-                },
-            )
-        }
+//    LaunchedEffect(longitude, latitude) {
+//        Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
+//        val lat = latitude
+//        val lng = longitude  // needs to eb changed
+//        if (lat != null && lng != null) {
+////            mapViewportState.flyTo(
+////                cameraOptions {
+////                    center(Point.fromLngLat(lng,lat ))
+////                    zoom(15.0)
+////                },
+//                mapAnimationOptions {
+//                    duration(3000)
+//                }
+////            )
+//        }
+//    }
+
+    val located = remember(memories) {
+        memories.filter { it.imgLatitude != null && it.imgLongitude != null }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize()
+        .background(MaterialTheme.colorScheme.background)
+    ) {
         MapboxMap(
             modifier = Modifier.fillMaxSize(),
             mapViewportState = mapViewportState,
+            // 1. Hide Compass
+            compass = {},
+            // 2. Hide Scale/Zoom Bar
+            scaleBar = {},
+            // 3. Hide Mapbox Logo
+            logo = {},
+            // 4. Hide Attribution ('i' info button)
+            attribution = {},
             onMapClickListener = { clickedPoint ->  // Listen for taps
                 // When user taps...
                 mapViewportState.easeTo(    // Smoothly move camera to
@@ -190,23 +245,26 @@ fun MapContent(
             }) {
             MapEffect(Unit) { mapView ->
                 mapView.location.updateSettings {
-                    locationPuck = createDefault2DPuck(withBearing = true)
+                    locationPuck = createDefault2DPuck(withBearing = false)
                     enabled = true
-                    puckBearing = PuckBearing.HEADING
+                    puckBearing = PuckBearing.COURSE
                     puckBearingEnabled = true
-                    pulsingEnabled = true
+                    pulsingEnabled = false
                     showAccuracyRing = true
-
                 }
                 mapViewportState.transitionToFollowPuckState(
                     FollowPuckViewportStateOptions.Builder()
                         .zoom(15.0)
+                        .bearing(null)
                         .build()
                 )
             }
-            memories.forEach { memory ->
+
+            Log.d("LocationScreen", "Rendering ${memories.size} memories on map: $memories")
+            located.forEach { memory ->
                 val lat = memory.imgLatitude
                 val lng = memory.imgLongitude
+                val isSelected = selectedMemory?.id == memory.id
                 if (lat != null && lng != null) {
                     ViewAnnotation(
                         options = viewAnnotationOptions {
@@ -214,49 +272,81 @@ fun MapContent(
                             allowOverlapWithPuck(true)
                             annotationAnchor {
                                 anchor(ViewAnnotationAnchor.BOTTOM)
+                                offsetX(-10.0)
+                                offsetY(20.0)
                             }
-                            priority(10)
-                            allowOverlap(true)
-                            ignoreCameraPadding(false)
+                            priority(if (isSelected)100 else 10 )
+                            minZoom(7f)
                             allowZElevate(true)
-                            minZoom(10f)
+                            allowOverlap(true)
 
                         },
                     ) {
                         MemoryMarker(
                             photoUrl = memory.imageUrl,
-                            isSelected = true,
-                            onClick = {}
+                            imagePath=memory.imagePath,
+                            isSelected = selectedMemory?.id == memory.id,
+                            dateLabel = memory.place,
+                            onClick = {
+                                selectedMemory = memory
+                            }
                         )
                     }
 
                 }
             }
         }
-        FloatingActionButton(
-            onClick = onLocationClick,
+        SmallFloatingActionButton(
+            onClick = {
+                // 1. Instantly center map on user's location puck
+                mapViewportState.transitionToFollowPuckState(
+                    FollowPuckViewportStateOptions.Builder()
+                        .zoom(15.0)
+                        .build()
+                )
+                // 2. Fetch fresh location coordinates in ViewModel
+                onLocationClick()
+            },
+            shape = CircleShape,
+            containerColor = Color.White,
+            contentColor = Color(0xFF1F1F1F),
+            elevation = FloatingActionButtonDefaults.elevation(
+                defaultElevation = 6.dp,
+                pressedElevation = 12.dp
+            ),
             modifier = Modifier
                 .align(Alignment.BottomEnd)
-                .padding(bottom = 80.dp, end = 16.dp),
-            containerColor = Color(0xFF1B6E1B),
+                .padding(bottom = 96.dp, end = 16.dp) // Positioned neatly above the bottom nav bar
         ) {
             Icon(
-                imageVector = Icons.Filled.LocationOn,
-                contentDescription = "location",
-                tint = Color.White
+                imageVector = Icons.Default.MyLocation,
+                contentDescription = "My Location",
+                tint = Color(0xFF1F1F1F),
+                modifier = Modifier.size(22.dp)
             )
         }
+        // 3. Render Modal Bottom Sheet when a memory is tapped
+        ImageViewerFromLocationSheet(
+            onDelete = onDelete,
+            memory = selectedMemory,
+            state = galleryState,
+            onDismiss = { selectedMemory = null },
+        )
     }
 }
 
 @Composable
 fun MemoryMarker(
     photoUrl: String,
+    imagePath: String? = null,
     isSelected: Boolean = false,
     dateLabel: String? = null,
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+
+    val context = LocalContext.current
+
     val scale by animateFloatAsState(
         targetValue = if (isSelected) 1.12f else 1f,
         animationSpec = spring(dampingRatio = 0.65f, stiffness = 400f),
@@ -267,6 +357,19 @@ fun MemoryMarker(
         targetValue = if (isSelected) 12.dp else 4.dp,
         label = "markerElevation"
     )
+    val imageRequest = remember(photoUrl,imagePath,context) {
+        ImageRequest.Builder(context)
+            .data(photoUrl)
+            .apply {
+                if (!imagePath.isNullOrBlank()) {
+                    memoryCacheKey(imagePath)
+                    diskCacheKey(imagePath)
+                }
+            }
+            .crossfade(true)
+            .build()
+
+    }
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -310,15 +413,16 @@ fun MemoryMarker(
                 contentAlignment = Alignment.Center,
                 modifier = Modifier.size(if (isSelected) 64.dp else 52.dp)
             ) {
-                AsyncImage(
-                    model = photoUrl,
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(3.dp)
-                        .clip(RoundedCornerShape(11.dp))
-                )
+                   AsyncImage(
+                       model = imageRequest,
+
+                       contentDescription = null,
+                       contentScale = ContentScale.Crop,
+                       modifier = Modifier
+                           .fillMaxSize()
+                           .padding(3.dp)
+                           .clip(RoundedCornerShape(11.dp))
+                   )
             }
         }
 

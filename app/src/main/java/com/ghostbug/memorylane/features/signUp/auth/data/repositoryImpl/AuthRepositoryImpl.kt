@@ -106,7 +106,11 @@ class AuthRepositoryImpl(
     override suspend fun isEmailInPublicUsersTable(): Result<Unit> {
         return try {
            val session= auth.currentSessionOrNull()
-            Result.success(Unit)
+            if (session != null) {
+                Result.success(Unit)
+            } else {
+                Result.failure(Exception("User not signed in"))
+            }
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {

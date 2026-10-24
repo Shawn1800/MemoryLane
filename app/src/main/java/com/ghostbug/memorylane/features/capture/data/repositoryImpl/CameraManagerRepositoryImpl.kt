@@ -6,6 +6,7 @@ import com.ghostbug.memorylane.features.capture.data.dto.MemoriesDto
 import com.ghostbug.memorylane.features.capture.data.dto.MemoryInsertDto
 import com.ghostbug.memorylane.features.capture.data.dto.toDomain
 import com.ghostbug.memorylane.features.capture.data.repositoryImpl.utils.ReverseGeocoder
+import com.ghostbug.memorylane.features.capture.data.repositoryImpl.utils.compressImage
 import com.ghostbug.memorylane.features.capture.domain.cache.CapturedMemory
 import com.ghostbug.memorylane.features.capture.domain.model.Memories
 import com.ghostbug.memorylane.features.capture.domain.repository.CameraManagerRepository
@@ -14,6 +15,10 @@ import io.github.jan.supabase.auth.Auth
 import io.github.jan.supabase.postgrest.Postgrest
 import io.github.jan.supabase.storage.Storage
 import io.ktor.utils.io.CancellationException
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 import kotlin.uuid.ExperimentalUuidApi
@@ -40,14 +45,17 @@ class CameraManagerRepositoryImpl(
         // place name is nice-to-have: never block the save on it
         val placeName =
             if (lat != null && lng != null) {
-                reverseGeocoder.reverseGeocode(lat, lng)
-            } else null
+                reverseGeocoder.reverseGeocode(lng,lat)
+            } else "unknown location"
 
         Log.e("CameraManagerRepositoryImpl", "SaveImageToDatabase: $placeName")
 
-        val bytes =
-            context.contentResolver.openInputStream(capturedMemory.uri)?.use { it.readBytes() }
-                ?: error("Could not read photo")
+        val bytes = compressImage(
+            context = context,
+            uri = capturedMemory.uri,
+            maxDimension = 1920,
+            quality = 85
+        )
 
         val path = "$userId/${Uuid.random()}.jpg"
 
@@ -79,14 +87,50 @@ class CameraManagerRepositoryImpl(
        TODO()
     }
 
-    override suspend fun getMemoriesFromDatabase(): Result<List<Memories>> {
-        return try {
+    override suspend fun getMemoriesFromDatabase(): Result<List<Memories>> = coroutineScope {
+        try {
+            // 1. Fetch memory metadata rows from Supabase database
             val dtos = postgrest.from("memories_").select().decodeList<MemoriesDto>()
-            val  memories = dtos.map { dto ->
-                val publicUrl = storage.from("memories").createSignedUrl(dto.imagePath,15.minutes)
-                dto.copy(imageUrl = publicUrl).toDomain()
+
+            // 2. Generate Signed URLs in PARALLEL simultaneously across background threads
+            val deferredMemories = dtos.map { dto ->
+                async {
+                    val signedUrl = try {
+                        storage.from("memories").createSignedUrl(dto.imagePath, 1.hours)
+                    } catch (e: Exception) {
+                        android.util.Log.e("CameraManagerRepositoryImpl",
+                            "Failed signed URL for ${dto.imagePath}", e)
+                        "" // If 1 file was deleted or invalid, don't fail the rest!
+                    }
+                    dto.copy(imageUrl = signedUrl).toDomain()
+                }
             }
+            // 3. Await all signed URLs and filter out any invalid/deleted files
+            val memories = deferredMemories.awaitAll().filter { it.imageUrl.isNotBlank() }
+
             Result.success(memories)
+        } catch (e: CancellationException) {
+            throw e
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    override suspend fun deleteMemory(memoryId: String): Result<Unit> {
+        return try {
+           val dto = postgrest.from("memories_")
+               .select { filter { eq("id", memoryId) } }
+               .decodeSingleOrNull<MemoriesDto>()
+
+            if (dto != null ) {
+                storage.from("memories").delete(dto.imagePath)
+            }
+            postgrest.from("memories_").delete {
+                filter {
+                    eq("id", memoryId)
+                }
+            }
+            Result.success(Unit)
         } catch (e: CancellationException) {
             throw e
         } catch (e: Exception) {
