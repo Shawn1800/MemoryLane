@@ -10,8 +10,6 @@ import kotlin.time.Instant
 data class ProfileDto(
     @SerialName("user_id")
     val userId: String,
-    @SerialName("email")
-    val email: String,
     @SerialName("name")
     val name: String = "",
     @SerialName("username")
