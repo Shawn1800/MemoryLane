@@ -7,10 +7,13 @@ import android.graphics.drawable.Icon
 import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
@@ -51,6 +54,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -119,27 +123,22 @@ fun MapScreen(
     onBack: () -> Unit,
 
 ) {
-
     val permissionState by permissionsViewModel.permissionState.collectAsStateWithLifecycle()
     val galleryState by galleryViewModel.state.collectAsStateWithLifecycle()
 
-//    LaunchedEffect(Unit) {
-//        permissionsViewModel.checkPermissions()
+    LaunchedEffect(Unit) {
+        permissionsViewModel.checkPermissions()
 
-//    }
+    }
     LaunchedEffect(Unit) {
         galleryViewModel.onEvent(GalleryEvent.GetAllMemories)
     }
-
-
     if (permissionState.hasLocationAccess) {
         val state by locationViewModel.state.collectAsStateWithLifecycle()
 
         LaunchedEffect(Unit) {
             locationViewModel.onEvent(LocationEvent.OnLocationButton)
         }
-
-
 
         MapContent(
             longitude = state.longitude,
@@ -151,7 +150,7 @@ fun MapScreen(
             onDelete = { memoryId ->
                 galleryViewModel.onEvent(GalleryEvent.onDeleteMemory(memoryId))
             },
-            galleryState = GalleryState(),
+            galleryState = galleryState,
             memories = galleryState.memories,
             onBack = onBack,
         )
@@ -164,10 +163,6 @@ fun MapScreen(
     }
 
 }
-
-
-
-
 @Composable
 fun MapContent(
     longitude: Double?,
@@ -181,41 +176,44 @@ fun MapContent(
 ) {
     // 1. State for currently selected memory tapped on map
     var selectedMemory by remember { mutableStateOf<Memories?>(null) }
+    var mapReady by remember { mutableStateOf(false) }
 
     LaunchedEffect(memories) {
         if (selectedMemory != null && memories.none { it.id == selectedMemory?.id }) {
             selectedMemory = null
         }
     }
-
-
-
     Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
     val mapViewportState = rememberMapViewportState {
         setCameraOptions {
-            zoom(2.0)
-            center(Point.fromLngLat(-98.0, 39.5))
+            zoom(3.0)
+            center(
+                if (latitude != null && longitude != null)
+                    Point.fromLngLat(longitude, latitude)
+                else
+                    Point.fromLngLat(-98.0, 39.5)  // fallback
+            )
             pitch(0.0)
             bearing(0.0)
         }
     }
-    // Whenever the ViewModel produces a new location, fly the camera to it.
-//    LaunchedEffect(longitude, latitude) {
-//        Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
-//        val lat = latitude
-//        val lng = longitude  // needs to eb changed
-//        if (lat != null && lng != null) {
-////            mapViewportState.flyTo(
-////                cameraOptions {
-////                    center(Point.fromLngLat(lng,lat ))
-////                    zoom(15.0)
-////                },
-//                mapAnimationOptions {
-//                    duration(3000)
-//                }
-////            )
-//        }
-//    }
+//     Whenever the ViewModel produces a new location, fly the camera to it.
+    LaunchedEffect(longitude, latitude) {
+        Log.d(TAG, "MapContent12:lat=$latitude,long=$longitude")
+        val lat = latitude
+        val lng = longitude  // needs to eb changed
+        if (lat != null && lng != null) {
+            mapViewportState.flyTo(
+                cameraOptions {
+                    center(Point.fromLngLat(lng,lat ))
+                    zoom(15.0)
+                },
+                mapAnimationOptions {
+                    duration(3000)
+                }
+            )
+        }
+    }
 
     val located = remember(memories) {
         memories.filter { it.imgLatitude != null && it.imgLongitude != null }
@@ -242,7 +240,8 @@ fun MapContent(
                         center(clickedPoint)  // Center on the tapped location
                     })
                 true  // Return true = "I handled the click"
-            }) {
+            })
+        {
             MapEffect(Unit) { mapView ->
                 mapView.location.updateSettings {
                     locationPuck = createDefault2DPuck(withBearing = false)
@@ -258,6 +257,7 @@ fun MapContent(
                         .bearing(null)
                         .build()
                 )
+                mapReady= true
             }
 
             Log.d("LocationScreen", "Rendering ${memories.size} memories on map: $memories")
@@ -279,7 +279,6 @@ fun MapContent(
                             minZoom(7f)
                             allowZElevate(true)
                             allowOverlap(true)
-
                         },
                     ) {
                         MemoryMarker(
@@ -296,6 +295,17 @@ fun MapContent(
                 }
             }
         }
+        AnimatedVisibility(
+            visible = !mapReady,
+            exit = fadeOut(animationSpec = tween(300))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.background)
+            )
+        }
+
         SmallFloatingActionButton(
             onClick = {
                 // 1. Instantly center map on user's location puck
@@ -415,13 +425,13 @@ fun MemoryMarker(
             ) {
                    AsyncImage(
                        model = imageRequest,
-
                        contentDescription = null,
                        contentScale = ContentScale.Crop,
                        modifier = Modifier
                            .fillMaxSize()
                            .padding(3.dp)
-                           .clip(RoundedCornerShape(11.dp))
+                           .clip(RoundedCornerShape(11.dp)),
+                       filterQuality = FilterQuality.Low
                    )
             }
         }

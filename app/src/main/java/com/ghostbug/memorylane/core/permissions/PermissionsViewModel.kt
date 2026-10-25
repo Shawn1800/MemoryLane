@@ -16,6 +16,12 @@ class PermissionsViewModel  (
      val permissionManager: PermissionManager
 ): ViewModel(){
 
+    init {
+        viewModelScope.launch {
+            permissionManager.checkPermissions()
+        }
+    }
+
     val permissionState = permissionManager.permissionState
     private val _uiEvent = MutableSharedFlow<PermissionUiEvent>()
     val uiEvent = _uiEvent.asSharedFlow()

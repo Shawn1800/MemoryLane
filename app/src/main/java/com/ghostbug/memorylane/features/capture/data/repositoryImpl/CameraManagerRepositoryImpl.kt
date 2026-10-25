@@ -98,8 +98,10 @@ class CameraManagerRepositoryImpl(
                     val signedUrl = try {
                         storage.from("memories").createSignedUrl(dto.imagePath, 1.hours)
                     } catch (e: Exception) {
-                        android.util.Log.e("CameraManagerRepositoryImpl",
-                            "Failed signed URL for ${dto.imagePath}", e)
+                        android.util.Log.e(
+                            "CameraManagerRepositoryImpl",
+                            "Failed signed URL for ${dto.imagePath}", e
+                        )
                         "" // If 1 file was deleted or invalid, don't fail the rest!
                     }
                     dto.copy(imageUrl = signedUrl).toDomain()

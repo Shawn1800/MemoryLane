@@ -56,11 +56,9 @@ fun MainNavigation(
     profileRepository: ProfileRepository = koinInject()
 ) {
     var startRoute by remember { mutableStateOf<Route?>(null) }
-    val permissionsViewModel: PermissionsViewModel = koinViewModel()
-    val profileViewModel: ProfileViewModel = koinViewModel ()
-    val signUpViewModel: SignUpViewModel = koinViewModel()
 
-    val galleryViewModel: GalleryViewModel = koinViewModel()
+
+
 
     val coroutineScope = rememberCoroutineScope()
     LaunchedEffect(Unit) {
@@ -70,6 +68,9 @@ fun MainNavigation(
             Route.SignUpScreen
         }
     }
+
+    val signUpViewModel: SignUpViewModel = koinViewModel()
+    val galleryViewModel: GalleryViewModel = koinViewModel()
 
     val resolvedStartRoute = startRoute ?: return
     val navigationState = rememberNavigationState(
@@ -161,6 +162,7 @@ fun MainNavigation(
                         )
                     }
                     entry<Route.onBoardingScreen1> {
+                        val profileViewModel: ProfileViewModel = koinViewModel ()
                         OnboardingScreen1(
                             onNext = {
                                 navigator.clearAll()

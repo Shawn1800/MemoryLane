@@ -74,9 +74,9 @@ fun PermissionScreen(
         permissionsViewModel.onPermissionChange(permissions)
     }
 
-    LaunchedEffect(Unit) {
-        permissionsViewModel.checkPermissions()
-    }
+//    LaunchedEffect(Unit) {
+//        permissionsViewModel.checkPermissions()
+//    }
 
     fun openSetting(){
         appContext.startActivity(permissionsViewModel.openSettings())
