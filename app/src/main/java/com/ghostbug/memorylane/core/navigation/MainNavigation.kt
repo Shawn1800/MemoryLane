@@ -147,7 +147,7 @@ fun MainNavigation(
                             galleryViewModel = galleryViewModel,
                             onCaptured = {},
                             modifier = modifier,
-                            onBack = { navigator.goBack() }
+                            onBack = { navigator.navigate(Route.LocationScreen) }
                         )
                     }
                     entry<Route.GalleryScreen> {
